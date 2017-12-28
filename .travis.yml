@@ -1,0 +1,15 @@
+language: go
+sudo: false
+go:
+  - 1.8.x
+  - 1.9.x
+
+install:
+  - go get github.com/onsi/ginkgo/ginkgo
+  - go get github.com/onsi/gomega/...
+  - go get -u github.com/golang/dep/cmd/dep
+  - export PATH=$PATH:$HOME/gopath/bin
+  - dep ensure
+
+script:
+ - $HOME/gopath/bin/ginkgo -r 
