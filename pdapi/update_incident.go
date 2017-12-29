@@ -12,7 +12,7 @@ import (
 )
 
 // UpdateIncident - update the incident on PD service
-func UpdateIncident(ctx *config.AppContext, info models.UpdateIncidentInfo) models.Incident {
+func UpdateIncident(ctx *config.AppContext, info models.IncidentUpdateInfo) models.Incident {
 	client, request := APIRequest(
 		ctx,
 		http.MethodPut,
