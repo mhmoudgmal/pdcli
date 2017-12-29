@@ -53,7 +53,7 @@ var _ = Describe("pdapi", func() {
 					BodyString(fmt.Sprintf(incidentString, "acknowledged"))
 
 				resultIncident := pdapi.UpdateIncident(
-					&ctx, models.UpdateIncidentInfo{
+					&ctx, models.IncidentUpdateInfo{
 						ID:     incident.Incident.ID,
 						From:   ctx.PDConfig.Email,
 						Status: "acknowledged",
@@ -74,7 +74,7 @@ var _ = Describe("pdapi", func() {
 					Reply(400)
 
 				go pdapi.UpdateIncident(
-					&ctx, models.UpdateIncidentInfo{
+					&ctx, models.IncidentUpdateInfo{
 						ID:     incident.Incident.ID,
 						From:   ctx.PDConfig.Email,
 						Status: "acknowledged",

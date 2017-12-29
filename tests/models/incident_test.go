@@ -10,10 +10,10 @@ import (
 
 var _ = Describe("Models/Incident", func() {
 	var incidentAsString func(string, string, string) string
-	var updateChannel chan UpdateIncidentInfo
+	var updateChannel chan IncidentUpdateInfo
 
 	BeforeEach(func() {
-		updateChannel = make(chan UpdateIncidentInfo)
+		updateChannel = make(chan IncidentUpdateInfo)
 
 		incidentAsString = func(color string, id string, htmlURL string) string {
 			return fmt.Sprintf("[⬤](fg-%s) %s @ %s", color, id, htmlURL)
@@ -61,12 +61,12 @@ var _ = Describe("Models/Incident", func() {
 
 	Describe("Ack()", func() {
 		Context("When status is triggered", func() {
-			It("Sends ack message to the UpdateIncidentInfo channel", func() {
+			It("Sends ack message to the IncidentUpdateInfo channel", func() {
 				incident := Incident{ID: "I1", Status: "triggered"}
 				go incident.Ack(&updateChannel, "foo@bar.baz")
 
 				Eventually(updateChannel).Should(Receive(
-					Equal(UpdateIncidentInfo{ID: incident.ID, Status: "acknowledged", From: "foo@bar.baz"}),
+					Equal(IncidentUpdateInfo{ID: incident.ID, Status: "acknowledged", From: "foo@bar.baz"}),
 				))
 				//// The DIY way!
 				//
@@ -105,7 +105,7 @@ var _ = Describe("Models/Incident", func() {
 				go incident.Resolve(&updateChannel, "foo@bar.baz")
 
 				Eventually(updateChannel).Should(Receive(
-					Equal(UpdateIncidentInfo{ID: incident.ID, Status: "resolved", From: "foo@bar.baz"}),
+					Equal(IncidentUpdateInfo{ID: incident.ID, Status: "resolved", From: "foo@bar.baz"}),
 				))
 			})
 		})
