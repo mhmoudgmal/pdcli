@@ -44,7 +44,7 @@ type AppContext struct {
 	FailuresChannel        *chan string
 	IncidentsChannel       *chan []models.Incident
 	FrequestDuration       time.Duration
-	PDUpdatingChannel      *chan models.UpdateIncidentInfo
+	PDUpdatingChannel      *chan models.IncidentUpdateInfo
 	UpdateStatusChannel    *chan models.Incident
 	StopFrequestingChannel *chan bool
 }

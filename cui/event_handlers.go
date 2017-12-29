@@ -11,7 +11,7 @@ func handleEvents(ctx *AppContext, wdgts Widgets) {
 
 	// send an "acknowledge" message to the PD updating channel
 	ui.Handle("/sys/kbd/C-k", func(ui.Event) {
-		*ctx.PDUpdatingChannel <- UpdateIncidentInfo{
+		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
 			ID:     wdgts.incidentsWidget.Current().ItemVal,
 			From:   ctx.PDConfig.Email,
 			Status: ACKNOWLEDGED,
@@ -20,7 +20,7 @@ func handleEvents(ctx *AppContext, wdgts Widgets) {
 
 	// send a "resolve" message to the PD updating channel
 	ui.Handle("/sys/kbd/C-r", func(ui.Event) {
-		*ctx.PDUpdatingChannel <- UpdateIncidentInfo{
+		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
 			ID:     wdgts.incidentsWidget.Current().ItemVal,
 			From:   ctx.PDConfig.Email,
 			Status: RESOLVED,

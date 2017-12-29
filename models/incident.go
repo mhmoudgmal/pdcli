@@ -1,13 +1,13 @@
 package models
 
 // ACKNOWLEDGED - incident status
-var ACKNOWLEDGED = "acknowledged"
+const ACKNOWLEDGED = "acknowledged"
 
 // RESOLVED - incident status
-var RESOLVED = "resolved"
+const RESOLVED = "resolved"
 
 // TRIGGERED - incident status
-var TRIGGERED = "triggered"
+const TRIGGERED = "triggered"
 
 var incidentStatusColorMapper = map[string]string{
 	TRIGGERED:    "(fg-red)",
@@ -36,8 +36,8 @@ type Service struct {
 	Summary string `json:"summary"`
 }
 
-// UpdateIncidentInfo - represents the message to be send when attempting to update the incident
-type UpdateIncidentInfo struct {
+// IncidentUpdateInfo - represents the message to be send when attempting to update the incident
+type IncidentUpdateInfo struct {
 	ID     string
 	From   string
 	Status string
@@ -51,9 +51,9 @@ func (incident *Incident) Inspect() string {
 // TODO: extract incident behaviours to different module/package
 
 // Ack - sends a message to the update incident channel
-func (incident *Incident) Ack(updateChan *chan UpdateIncidentInfo, from string) {
+func (incident *Incident) Ack(updateChan *chan IncidentUpdateInfo, from string) {
 	if incident.Status == TRIGGERED {
-		*updateChan <- UpdateIncidentInfo{
+		*updateChan <- IncidentUpdateInfo{
 			incident.ID,
 			from,
 			ACKNOWLEDGED,
@@ -62,9 +62,9 @@ func (incident *Incident) Ack(updateChan *chan UpdateIncidentInfo, from string) 
 }
 
 // Resolve - sends a message to the update incident channel
-func (incident *Incident) Resolve(updateChan *chan UpdateIncidentInfo, from string) {
+func (incident *Incident) Resolve(updateChan *chan IncidentUpdateInfo, from string) {
 	if incident.Status != RESOLVED {
-		*updateChan <- UpdateIncidentInfo{
+		*updateChan <- IncidentUpdateInfo{
 			incident.ID,
 			from,
 			RESOLVED,
