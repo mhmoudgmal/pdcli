@@ -14,7 +14,7 @@ var stopFrequesting = make(chan bool)                              // stop reque
 var failuresChannel = make(chan string)                            // send failure message when something goes wrong.
 var incidentsChannel = make(chan []models.Incident)                // pass incidents between different application parts whenever you have one.
 var updateStatusChannel = make(chan models.Incident)               // pass incident when it is updated, to update other parts in the application.
-var incidentUpdatingChannel = make(chan models.UpdateIncidentInfo) // send incident update message for updating the incident status.
+var incidentUpdatingChannel = make(chan models.IncidentUpdateInfo) // send incident update message for updating the incident status.
 
 func main() {
 	// TODO: refactor and extract flags/options to different package, and also support to read/serialize the options vlaues from/to file.
