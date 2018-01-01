@@ -62,8 +62,8 @@ func incidentsWidget() *ui.ListBox {
 }
 
 type Widgets struct {
-	helpWidget         *ui.Par
-	modeWidget         *ui.Gauge
-	incidentsWidget    *ui.ListBox
-	modeTextNoteWidget *ui.Par
+	HelpWidget         *ui.Par
+	ModeWidget         *ui.Gauge
+	IncidentsWidget    *ui.ListBox
+	ModeTextNoteWidget *ui.Par
 }

@@ -7,12 +7,12 @@ import (
 	ui "github.com/pdevine/termui"
 )
 
-func handleEvents(ctx *AppContext, wdgts Widgets) {
+func HandleEvents(ctx *AppContext, wdgts Widgets) {
 
 	// send an "acknowledge" message to the PD updating channel
 	ui.Handle("/sys/kbd/C-k", func(ui.Event) {
 		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
-			ID:     wdgts.incidentsWidget.Current().ItemVal,
+			ID:     wdgts.IncidentsWidget.Current().ItemVal,
 			From:   ctx.PDConfig.Email,
 			Status: ACKNOWLEDGED,
 		}
@@ -21,7 +21,7 @@ func handleEvents(ctx *AppContext, wdgts Widgets) {
 	// send a "resolve" message to the PD updating channel
 	ui.Handle("/sys/kbd/C-r", func(ui.Event) {
 		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
-			ID:     wdgts.incidentsWidget.Current().ItemVal,
+			ID:     wdgts.IncidentsWidget.Current().ItemVal,
 			From:   ctx.PDConfig.Email,
 			Status: RESOLVED,
 		}
@@ -35,9 +35,9 @@ func handleEvents(ctx *AppContext, wdgts Widgets) {
 			ctx.Mode = &ModeM
 		}
 
-		wdgts.modeWidget.Label = ctx.Mode.Code
-		wdgts.modeWidget.BarColor = ctx.Mode.Color
-		wdgts.modeTextNoteWidget.Text = ctx.Mode.Note
+		wdgts.ModeWidget.Label = ctx.Mode.Code
+		wdgts.ModeWidget.BarColor = ctx.Mode.Color
+		wdgts.ModeTextNoteWidget.Text = ctx.Mode.Note
 
 		ui.Render(ui.Body)
 	})
@@ -50,13 +50,13 @@ func handleEvents(ctx *AppContext, wdgts Widgets) {
 	})
 
 	ui.Handle("/sys/kbd/<up>", func(ui.Event) {
-		wdgts.incidentsWidget.Up()
-		ui.Render(wdgts.incidentsWidget)
+		wdgts.IncidentsWidget.Up()
+		ui.Render(wdgts.IncidentsWidget)
 	})
 
 	ui.Handle("/sys/kbd/<down>", func(ui.Event) {
-		wdgts.incidentsWidget.Down()
-		ui.Render(wdgts.incidentsWidget)
+		wdgts.IncidentsWidget.Down()
+		ui.Render(wdgts.IncidentsWidget)
 	})
 
 	// Close app

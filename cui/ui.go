@@ -25,19 +25,19 @@ func InitUI(ctx *config.AppContext) {
 	ui.Body.AddRows(
 		ui.NewRow(
 			ui.NewRow(
-				ui.NewCol(6, 0, widgets.helpWidget),
+				ui.NewCol(6, 0, widgets.HelpWidget),
 				ui.NewCol(6, 0, ui.NewRow(
 					ui.NewRow(
-						ui.NewCol(12, 0, widgets.modeWidget, widgets.modeTextNoteWidget)))))),
+						ui.NewCol(12, 0, widgets.ModeWidget, widgets.ModeTextNoteWidget)))))),
 		ui.NewRow(
-			ui.NewCol(6, 0, widgets.incidentsWidget)))
+			ui.NewCol(6, 0, widgets.IncidentsWidget)))
 
 	// calculate layout and render
 	ui.Body.Align()
 	ui.Render(ui.Body)
 
-	go handleEvents(ctx, widgets)
-	go updateIncidentsWidget(ctx, widgets.incidentsWidget)
+	go HandleEvents(ctx, widgets)
+	go updateIncidentsWidget(ctx, widgets.IncidentsWidget)
 
 	ui.Loop()
 }
