@@ -4,9 +4,9 @@ import (
 	"flag"
 	"time"
 
-	"github.com/mhmoudgmal/pdcli/config"
-	"github.com/mhmoudgmal/pdcli/cui"
-	"github.com/mhmoudgmal/pdcli/models"
+	"pdcli/config"
+	"pdcli/cui"
+	"pdcli/models"
 )
 
 var term = make(chan bool)                                         // application terminate.

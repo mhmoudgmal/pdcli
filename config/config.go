@@ -1,9 +1,10 @@
 package config
 
 import (
+	"pdcli/models"
+
 	"time"
 
-	"github.com/mhmoudgmal/pdcli/models"
 	ui "github.com/pdevine/termui"
 )
 

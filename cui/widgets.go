@@ -1,7 +1,8 @@
 package cui
 
 import (
-	"github.com/mhmoudgmal/pdcli/config"
+	. "pdcli/config"
+
 	ui "github.com/pdevine/termui"
 )
 
@@ -24,7 +25,7 @@ C-r     Resolve selected incident
 	return helpWidget
 }
 
-func modeWidget(cfg *config.AppContext) *ui.Gauge {
+func modeWidget(cfg *AppContext) *ui.Gauge {
 	modeWidget := ui.NewGauge()
 	modeWidget.Percent = 100
 	modeWidget.Label = cfg.Mode.Code
@@ -39,7 +40,7 @@ func modeWidget(cfg *config.AppContext) *ui.Gauge {
 	return modeWidget
 }
 
-func modeTextNoteWidget(cfg *config.AppContext) *ui.Par {
+func modeTextNoteWidget(cfg *AppContext) *ui.Par {
 	modeTextNoteWidget := ui.NewPar(cfg.Mode.Note)
 	modeTextNoteWidget.Border = false
 	modeTextNoteWidget.Height = 4

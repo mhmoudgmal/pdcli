@@ -1,12 +1,13 @@
 package cui
 
 import (
-	"github.com/mhmoudgmal/pdcli/config"
+	. "pdcli/config"
+
 	ui "github.com/pdevine/termui"
 )
 
 // InitUI ....
-func InitUI(ctx *config.AppContext) {
+func InitUI(ctx *AppContext) {
 	err := ui.Init()
 	if err != nil {
 		panic(err)

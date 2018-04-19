@@ -3,14 +3,14 @@ package main
 import (
 	"time"
 
-	"github.com/mhmoudgmal/pdcli/config"
-	"github.com/mhmoudgmal/pdcli/models"
-	"github.com/mhmoudgmal/pdcli/pdapi"
+	. "pdcli/config"
+	"pdcli/models"
+	"pdcli/pdapi"
 )
 
 // PDWorker - starts a ticker every 2/? seconds gets incidents if any and sends the result through IncidentsChannel,
 // Auto Acknowledge the incidents if the auto-ack mode is enabled.
-func PDWorker(ctx *config.AppContext) {
+func PDWorker(ctx *AppContext) {
 	go func() {
 		params := map[string]string{"since": ""}
 
@@ -23,7 +23,7 @@ func PDWorker(ctx *config.AppContext) {
 
 				*ctx.IncidentsChannel <- incidents
 
-				if ctx.Mode.Code == config.ModeA.Code {
+				if ctx.Mode.Code == ModeA.Code {
 					autoAck(ctx, incidents)
 				}
 			}
@@ -42,7 +42,7 @@ func PDWorker(ctx *config.AppContext) {
 	<-*ctx.StopFrequestingChannel
 }
 
-func autoAck(ctx *config.AppContext, incidents []models.Incident) {
+func autoAck(ctx *AppContext, incidents []models.Incident) {
 	for _, incident := range incidents {
 		incident.Ack(ctx.PDUpdatingChannel, ctx.PDConfig.Email)
 	}

@@ -1,11 +1,12 @@
 package cui
 
 import (
-	"github.com/mhmoudgmal/pdcli/config"
+	. "pdcli/config"
+
 	ui "github.com/pdevine/termui"
 )
 
-func updateIncidentsWidget(ctx *config.AppContext, incidentList *ui.ListBox) {
+func updateIncidentsWidget(ctx *AppContext, incidentList *ui.ListBox) {
 	incidentsItems := []ui.Item{}
 
 	for {

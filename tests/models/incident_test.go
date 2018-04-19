@@ -1,11 +1,12 @@
 package models_test
 
 import (
-	"fmt"
+	. "pdcli/models"
 
-	. "github.com/mhmoudgmal/pdcli/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"fmt"
 )
 
 var _ = Describe("Models/Incident", func() {

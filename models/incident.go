@@ -15,8 +15,6 @@ var incidentStatusColorMapper = map[string]string{
 	RESOLVED:     "(fg-green)",
 }
 
-// -----------------------------------------------
-
 // Incident minimal representation
 type Incident struct {
 	IncidentNumber int    `json:"incident_number"`

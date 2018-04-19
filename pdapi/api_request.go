@@ -1,17 +1,17 @@
 package pdapi
 
 import (
+	. "pdcli/config"
+
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/mhmoudgmal/pdcli/config"
 )
 
 const baseURL = "https://api.pagerduty.com/incidents/"
 
 // APIRequest - PD Api request
-func APIRequest(ctx *config.AppContext, method string, url string, data io.Reader) (http.Client, *http.Request) {
+func APIRequest(ctx *AppContext, method string, url string, data io.Reader) (http.Client, *http.Request) {
 	client := http.Client{
 		Timeout: time.Second * 2,
 	}

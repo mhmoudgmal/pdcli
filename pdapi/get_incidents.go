@@ -1,18 +1,18 @@
 package pdapi
 
 import (
+	. "pdcli/config"
+	. "pdcli/models"
+
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	"github.com/mhmoudgmal/pdcli/config"
-	. "github.com/mhmoudgmal/pdcli/models"
 )
 
 // GetIncidents - requests the incidents from PD service
-func GetIncidents(ctx *config.AppContext, options map[string]string) []Incident {
+func GetIncidents(ctx *AppContext, options map[string]string) []Incident {
 	client, request := APIRequest(ctx, http.MethodGet, buildURL(options), nil)
 
 	res, getErr := client.Do(request)

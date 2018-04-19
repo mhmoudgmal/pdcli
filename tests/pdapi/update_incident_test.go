@@ -1,16 +1,16 @@
 package pdapi_test
 
 import (
-	"encoding/json"
-	"fmt"
+	"pdcli/config"
+	"pdcli/models"
+	"pdcli/pdapi"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 
-	"github.com/mhmoudgmal/pdcli/config"
-	"github.com/mhmoudgmal/pdcli/models"
-	"github.com/mhmoudgmal/pdcli/pdapi"
+	"encoding/json"
+	"fmt"
 )
 
 var _ = Describe("pdapi", func() {
@@ -27,13 +27,13 @@ var _ = Describe("pdapi", func() {
 
 			incidentString = `{
 				"incident": {
-							"id": "PT4KHLK", 
-							"type": "incident", 
-							"html_url": "https://subdomain.pagerduty.com/incidents/PT4KHLK", 
-							"created_at": "2015-10-06T21:30:42Z", 
-							"status": "%s", 
-							"service": { 
-								"id": "PIJ90N7", 
+							"id": "PT4KHLK",
+							"type": "incident",
+							"html_url": "https://subdomain.pagerduty.com/incidents/PT4KHLK",
+							"created_at": "2015-10-06T21:30:42Z",
+							"status": "%s",
+							"service": {
+								"id": "PIJ90N7",
 								"summary": "My Mail Service"
 							}
 						}

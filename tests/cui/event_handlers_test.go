@@ -1,9 +1,10 @@
 package cui_test
 
 import (
-	"github.com/mhmoudgmal/pdcli/config"
-	cui "github.com/mhmoudgmal/pdcli/cui"
-	. "github.com/mhmoudgmal/pdcli/models"
+	"pdcli/config"
+	"pdcli/cui"
+	. "pdcli/models"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	ui "github.com/pdevine/termui"

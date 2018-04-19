@@ -1,8 +1,8 @@
 package cui
 
 import (
-	. "github.com/mhmoudgmal/pdcli/config"
-	. "github.com/mhmoudgmal/pdcli/models"
+	. "pdcli/config"
+	. "pdcli/models"
 
 	ui "github.com/pdevine/termui"
 )

@@ -1,18 +1,18 @@
 package pdapi
 
 import (
+	. "pdcli/config"
+	"pdcli/models"
+
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/mhmoudgmal/pdcli/config"
-	"github.com/mhmoudgmal/pdcli/models"
 )
 
 // UpdateIncident - update the incident on PD service
-func UpdateIncident(ctx *config.AppContext, info models.IncidentUpdateInfo) models.Incident {
+func UpdateIncident(ctx *AppContext, info models.IncidentUpdateInfo) models.Incident {
 	client, request := APIRequest(
 		ctx,
 		http.MethodPut,
