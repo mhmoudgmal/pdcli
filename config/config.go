@@ -1,11 +1,11 @@
 package config
 
 import (
-	"pdcli/models"
+	ui "github.com/pdevine/termui"
 
 	"time"
 
-	ui "github.com/pdevine/termui"
+	"pdcli/models"
 )
 
 var (

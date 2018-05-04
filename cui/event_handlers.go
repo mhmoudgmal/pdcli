@@ -1,12 +1,18 @@
 package cui
 
 import (
+	ui "github.com/pdevine/termui"
+
 	. "pdcli/config"
 	. "pdcli/models"
-
-	ui "github.com/pdevine/termui"
 )
 
+// HandleEvents handls the kyboard commands.
+//
+// C-k ---> Ack!
+// C-r ---> Resolve!
+// C-t ---> Toggle Auto-Ack mode
+// C-c ---> Close app
 func HandleEvents(ctx *AppContext, wdgts Widgets) {
 
 	// send an "acknowledge" message to the PD updating channel
@@ -18,7 +24,6 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 		}
 	})
 
-	// send a "resolve" message to the PD updating channel
 	ui.Handle("/sys/kbd/C-r", func(ui.Event) {
 		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
 			ID:     wdgts.IncidentsWidget.Current().ItemVal,
@@ -27,7 +32,6 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 		}
 	})
 
-	// toggle Auto-Ack mode
 	ui.Handle("/sys/kbd/C-t", func(ui.Event) {
 		if ctx.Mode == &ModeM {
 			ctx.Mode = &ModeA
@@ -59,7 +63,6 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 		ui.Render(wdgts.IncidentsWidget)
 	})
 
-	// Close app
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
 		*ctx.TermChannel <- true
 		*ctx.StopFrequestingChannel <- true

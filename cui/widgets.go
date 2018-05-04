@@ -1,9 +1,9 @@
 package cui
 
 import (
-	. "pdcli/config"
-
 	ui "github.com/pdevine/termui"
+
+	. "pdcli/config"
 )
 
 func helpWidget() *ui.Par {

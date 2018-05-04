@@ -1,11 +1,11 @@
 package pdapi
 
 import (
-	. "pdcli/config"
-
 	"io"
 	"net/http"
 	"time"
+
+	. "pdcli/config"
 )
 
 const baseURL = "https://api.pagerduty.com/incidents/"

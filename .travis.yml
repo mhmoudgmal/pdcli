@@ -12,8 +12,7 @@ install:
   - dep ensure
 
 before_script:
-  - cd $GOPATH/src
-  - mv ./github.com/mhmoudgmal/pdcli .
+  - cd $GOPATH/src; mv ./github.com/mhmoudgmal/pdcli .
   - cd ./pdcli
 
 script:

@@ -1,18 +1,18 @@
 package cui
 
 import (
-	. "pdcli/config"
-
 	ui "github.com/pdevine/termui"
+
+	. "pdcli/config"
 )
 
-// InitUI ....
+// InitUI Initializes the app CUI
 func InitUI(ctx *AppContext) {
-	err := ui.Init()
-	if err != nil {
+	defer ui.Close()
+
+	if err := ui.Init(); err != nil {
 		panic(err)
 	}
-	defer ui.Close()
 
 	// create widgets
 	widgets := Widgets{

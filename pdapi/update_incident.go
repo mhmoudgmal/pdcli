@@ -1,18 +1,18 @@
 package pdapi
 
 import (
-	. "pdcli/config"
-	"pdcli/models"
-
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	. "pdcli/config"
+	. "pdcli/models"
 )
 
 // UpdateIncident - update the incident on PD service
-func UpdateIncident(ctx *AppContext, info models.IncidentUpdateInfo) models.Incident {
+func UpdateIncident(ctx *AppContext, info IncidentUpdateInfo) Incident {
 	client, request := APIRequest(
 		ctx,
 		http.MethodPut,
@@ -24,7 +24,7 @@ func UpdateIncident(ctx *AppContext, info models.IncidentUpdateInfo) models.Inci
 	request.Header.Set("Content-Type", "application/json")
 
 	res, putErr := client.Do(request)
-	result := struct{ Incident models.Incident }{models.Incident{}}
+	result := struct{ Incident Incident }{Incident{}}
 
 	if putErr != nil {
 		*ctx.FailuresChannel <- putErr.Error()

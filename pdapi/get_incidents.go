@@ -1,14 +1,14 @@
 package pdapi
 
 import (
-	. "pdcli/config"
-	. "pdcli/models"
-
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	. "pdcli/config"
+	. "pdcli/models"
 )
 
 // GetIncidents - requests the incidents from PD service
