@@ -1,15 +1,15 @@
 package pdapi_test
 
 import (
-	"pdcli/config"
-	"pdcli/models"
-	"pdcli/pdapi"
-
 	"encoding/json"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
+
+	"pdcli/config"
+	"pdcli/models"
+	"pdcli/pdapi"
 )
 
 var _ = Describe("pdapi", func() {

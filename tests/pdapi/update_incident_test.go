@@ -1,16 +1,16 @@
 package pdapi_test
 
 import (
-	"pdcli/config"
-	"pdcli/models"
-	"pdcli/pdapi"
+	"encoding/json"
+	"fmt"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/h2non/gock.v1"
 
-	"encoding/json"
-	"fmt"
+	"pdcli/config"
+	"pdcli/models"
+	"pdcli/pdapi"
 )
 
 var _ = Describe("pdapi", func() {
@@ -22,7 +22,15 @@ var _ = Describe("pdapi", func() {
 
 		BeforeEach(func() {
 			failuresChannel = make(chan string)
-			ctx = config.AppContext{FailuresChannel: &failuresChannel, PDConfig: &config.PDConfig{Email: "foo@bar.baz", Token: "pd_token"}}
+
+			ctx = config.AppContext{
+				FailuresChannel: &failuresChannel,
+				PDConfig: &config.PDConfig{
+					Email: "foo@bar.baz",
+					Token: "pd_token",
+				},
+			}
+
 			incident = struct{ Incident models.Incident }{models.Incident{}}
 
 			incidentString = `{
@@ -42,8 +50,10 @@ var _ = Describe("pdapi", func() {
 			json.Unmarshal([]byte(fmt.Sprintf(incidentString, "triggered")), &incident)
 		})
 
-		Context("when 200", func() {
-			It("returns the updated incident", func() {
+		Context("when request succeeds", func() {
+			var resultIncident models.Incident
+
+			JustBeforeEach(func() {
 				gock.New("https://api.pagerduty.com/incidents/"+incident.Incident.ID).
 					HeaderPresent("Authorization").
 					MatchHeader("Content-Type", "application/json").
@@ -52,22 +62,27 @@ var _ = Describe("pdapi", func() {
 					Reply(200).
 					BodyString(fmt.Sprintf(incidentString, "acknowledged"))
 
-				resultIncident := pdapi.UpdateIncident(
+				resultIncident = pdapi.UpdateIncident(
 					&ctx, models.IncidentUpdateInfo{
 						ID:     incident.Incident.ID,
 						From:   ctx.PDConfig.Email,
 						Status: "acknowledged",
 					},
 				)
+			})
 
-				Expect(*ctx.FailuresChannel).NotTo(Receive())
+			It("returns the updated incident", func() {
 				Expect(resultIncident.Status).To(Equal("acknowledged"))
+				Expect(gock.IsDone()).To(Equal(true))
+			})
 
+			It("does not send any messages to the failure chan", func() {
+				Expect(*ctx.FailuresChannel).NotTo(Receive())
 				Expect(gock.IsDone()).To(Equal(true))
 			})
 		})
 
-		Context("when 400", func() {
+		Context("when bad request", func() {
 			It("sends error message through the failures channel", func() {
 				gock.New("https://api.pagerduty.com/incidents/" + incident.Incident.ID).
 					Put("/").
