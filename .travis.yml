@@ -11,5 +11,11 @@ install:
   - export PATH=$PATH:$HOME/gopath/bin
   - dep ensure
 
+before_script:
+  - cd $GOPATH/src
+  - mv ./github.com/mhmoudgmal/pdcli .
+  - cd ./pdcli
+
 script:
- - $HOME/gopath/bin/ginkgo -r 
+ - $HOME/gopath/bin/ginkgo -r
+
