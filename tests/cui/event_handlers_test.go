@@ -1,16 +1,16 @@
 package cui_test
 
 import (
-	"pdcli/config"
-	"pdcli/cui"
-	. "pdcli/models"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	ui "github.com/pdevine/termui"
+
+	"pdcli/config"
+	"pdcli/cui"
+	"pdcli/models"
 )
 
-func test_command(ctx *config.AppContext, commandOpts map[string]string, expect func()) {
+func testCommand(ctx *config.AppContext, commandOpts map[string]string, expect func()) {
 	Describe(commandOpts["cmd"], func() {
 		incidentsWdgtMock := &ui.ListBox{
 			Items: []ui.Item{ui.Item{
@@ -37,7 +37,7 @@ var _ = Describe("Events", func() {
 	var pdcfg config.PDConfig
 
 	BeforeSuite(func() {
-		updatingChan := make(chan IncidentUpdateInfo)
+		updatingChan := make(chan models.IncidentUpdateInfo)
 		termChan := make(chan bool)
 		stopFreqChan := make(chan bool)
 
@@ -50,23 +50,23 @@ var _ = Describe("Events", func() {
 		}
 	})
 
-	test_command(&ctx, map[string]string{"cmd": "C-k", "path": "/sys/kbd/C-k", "msg": "sends ACKNOWLEDGED message to PDUpdating chan"}, func() {
-		Eventually(*ctx.PDUpdatingChannel).Should(Receive(Equal(IncidentUpdateInfo{
+	testCommand(&ctx, map[string]string{"cmd": "C-k", "path": "/sys/kbd/C-k", "msg": "sends ACKNOWLEDGED message to PDUpdating chan"}, func() {
+		Eventually(*ctx.PDUpdatingChannel).Should(Receive(Equal(models.IncidentUpdateInfo{
 			ID:     "Item1",
 			From:   pdcfg.Email,
-			Status: ACKNOWLEDGED,
+			Status: models.ACKNOWLEDGED,
 		})))
 	})
 
-	test_command(&ctx, map[string]string{"cmd": "C-r", "path": "/sys/kbd/C-r", "msg": "sends RESOLVED message to PDUpdating chan"}, func() {
-		Eventually(*ctx.PDUpdatingChannel).Should(Receive(Equal(IncidentUpdateInfo{
+	testCommand(&ctx, map[string]string{"cmd": "C-r", "path": "/sys/kbd/C-r", "msg": "sends RESOLVED message to PDUpdating chan"}, func() {
+		Eventually(*ctx.PDUpdatingChannel).Should(Receive(Equal(models.IncidentUpdateInfo{
 			ID:     "Item1",
 			From:   pdcfg.Email,
-			Status: RESOLVED,
+			Status: models.RESOLVED,
 		})))
 	})
 
-	test_command(&ctx, map[string]string{"cmd": "C-c", "path": "/sys/kbd/C-c", "msg": "sends TERM & STOPFREQUESTING messages"}, func() {
+	testCommand(&ctx, map[string]string{"cmd": "C-c", "path": "/sys/kbd/C-c", "msg": "sends TERM & STOPFREQUESTING messages"}, func() {
 		Eventually(*ctx.TermChannel).Should(Receive(Equal(true)))
 		Eventually(*ctx.StopFrequestingChannel).Should(Receive(Equal(true)))
 	})
