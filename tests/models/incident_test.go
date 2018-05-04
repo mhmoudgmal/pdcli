@@ -1,12 +1,12 @@
 package models_test
 
 import (
-	. "pdcli/models"
+	"fmt"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"fmt"
+	. "pdcli/models"
 )
 
 var _ = Describe("Models/Incident", func() {
@@ -23,8 +23,8 @@ var _ = Describe("Models/Incident", func() {
 	})
 
 	Describe("Inspect()", func() {
-		Context("With 'triggered' Status", func() {
-			It("Should be the red dot + description + htmlURL", func() {
+		Context("when status is 'triggered'", func() {
+			It("returns red dot + description + htmlURL", func() {
 				triggeredIncident := Incident{
 					ID:          "I1",
 					Description: "I1 Desc",
@@ -35,8 +35,8 @@ var _ = Describe("Models/Incident", func() {
 			})
 		})
 
-		Context("With 'acknowledged' Status", func() {
-			It("Should be the yellow dot + description + htmlURL", func() {
+		Context("when status is 'acknowledged'", func() {
+			It("returns yellow dot + description + htmlURL", func() {
 				acknowlededIncident := Incident{
 					ID:          "I2",
 					Description: "I2 Desc",
@@ -47,8 +47,8 @@ var _ = Describe("Models/Incident", func() {
 			})
 		})
 
-		Context("With 'resolved' Status", func() {
-			It("Should be the green dot + description + htmlURL", func() {
+		Context("when status is 'resolved'", func() {
+			It("returns green dot + description + htmlURL", func() {
 				resolvedIncident := Incident{
 					ID:          "I3",
 					Description: "I3 Desc",
@@ -112,7 +112,7 @@ var _ = Describe("Models/Incident", func() {
 		})
 
 		Context("When status is 'resolved'", func() {
-			It("Should not send any messages to the updateChannel", func() {
+			It("does not send any messages to the updateChannel", func() {
 				incident := Incident{ID: "I1", Status: "resolved"}
 				go incident.Resolve(&updateChannel, "foo@bar.baz")
 
