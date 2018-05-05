@@ -9,12 +9,14 @@ import (
 	"pdcli/models"
 )
 
-var term = make(chan bool)                                         // application terminate.
-var stopFrequesting = make(chan bool)                              // stop requesting pd api.
-var failuresChannel = make(chan string)                            // send failure message when something goes wrong.
-var incidentsChannel = make(chan []models.Incident)                // pass incidents between different application parts whenever you have one.
-var updateStatusChannel = make(chan models.Incident)               // pass incident when it is updated, to update other parts in the application.
-var incidentUpdatingChannel = make(chan models.IncidentUpdateInfo) // send incident update message for updating the incident status.
+var (
+	term                    = make(chan bool)                      // application terminate.
+	stopFrequesting         = make(chan bool)                      // stop requesting pd api.
+	failuresChannel         = make(chan string)                    // send failure message when something goes wrong.
+	incidentsChannel        = make(chan []models.Incident)         // pass incidents between different application parts whenever you have one.
+	updateStatusChannel     = make(chan models.Incident)           // pass incident when it is updated, to update other parts in the application.
+	incidentUpdatingChannel = make(chan models.IncidentUpdateInfo) // send incident update message for updating the incident status.
+)
 
 func main() {
 	// TODO: refactor and extract flags/options to different package, and also support to read/serialize the options vlaues from/to file.
