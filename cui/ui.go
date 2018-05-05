@@ -3,11 +3,11 @@ package cui
 import (
 	ui "github.com/pdevine/termui"
 
-	. "pdcli/config"
+	"pdcli/config"
 )
 
 // InitUI Initializes the app CUI
-func InitUI(ctx *AppContext) {
+func InitUI(ctx *config.AppContext) {
 	defer ui.Close()
 
 	if err := ui.Init(); err != nil {
