@@ -7,16 +7,18 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	. "pdcli/config"
-	. "pdcli/models"
+	"pdcli/config"
+	"pdcli/models"
 )
 
 // UpdateIncident - update the incident on PD service
-func UpdateIncident(ctx *AppContext, info IncidentUpdateInfo) Incident {
+func UpdateIncident(ctx *config.AppContext, info models.IncidentUpdateInfo) models.Incident {
+	apiURL := baseURL + "/incidents/" + info.ID
+
 	client, request := APIRequest(
 		ctx,
 		http.MethodPut,
-		baseURL+info.ID,
+		apiURL,
 		bytes.NewReader(jsonBody(info.Status)),
 	)
 
@@ -24,7 +26,7 @@ func UpdateIncident(ctx *AppContext, info IncidentUpdateInfo) Incident {
 	request.Header.Set("Content-Type", "application/json")
 
 	res, putErr := client.Do(request)
-	result := struct{ Incident Incident }{Incident{}}
+	result := struct{ Incident models.Incident }{models.Incident{}}
 
 	if putErr != nil {
 		*ctx.FailuresChannel <- putErr.Error()

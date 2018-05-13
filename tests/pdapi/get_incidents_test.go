@@ -18,8 +18,8 @@ var _ = Describe("pdapi", func() {
 		var ctx config.AppContext
 
 		BeforeEach(func() {
-
 			failuresChannel = make(chan string)
+
 			ctx = config.AppContext{
 				FailuresChannel: &failuresChannel,
 				PDConfig: &config.PDConfig{

@@ -7,16 +7,23 @@ import (
 	"net/http"
 	"net/url"
 
-	. "pdcli/config"
-	. "pdcli/models"
+	"pdcli/config"
+	"pdcli/models"
 )
 
 // GetIncidents - requests the incidents from PD service
-func GetIncidents(ctx *AppContext, options map[string]string) []Incident {
-	client, request := APIRequest(ctx, http.MethodGet, buildURL(options), nil)
+func GetIncidents(ctx *config.AppContext, options map[string]string) []models.Incident {
+	apiURL := baseURL + "/incidents"
+
+	client, request := APIRequest(
+		ctx,
+		http.MethodGet,
+		buildURL(apiURL, options),
+		nil,
+	)
 
 	res, getErr := client.Do(request)
-	result := struct{ Incidents []Incident }{[]Incident{}}
+	result := struct{ Incidents []models.Incident }{[]models.Incident{}}
 
 	if getErr != nil {
 		*ctx.FailuresChannel <- getErr.Error()
@@ -38,11 +45,11 @@ func GetIncidents(ctx *AppContext, options map[string]string) []Incident {
 	return result.Incidents
 }
 
-func buildURL(options map[string]string) string {
+func buildURL(apiURL string, options map[string]string) string {
 	params := url.Values{}
 	for pName, pValue := range options {
 		params.Add(pName, pValue)
 	}
 
-	return fmt.Sprintf("%s?%s", baseURL, params.Encode())
+	return fmt.Sprintf("%s?%s", apiURL, params.Encode())
 }
