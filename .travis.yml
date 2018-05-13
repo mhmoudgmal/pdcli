@@ -3,6 +3,7 @@ sudo: false
 go:
   - 1.8.x
   - 1.9.x
+  - 1.10.x
 
 install:
   - go get github.com/onsi/ginkgo/ginkgo
@@ -16,5 +17,5 @@ before_script:
   - cd ./pdcli
 
 script:
- - $HOME/gopath/bin/ginkgo -r
+ - $HOME/gopath/bin/ginkgo -r --randomizeAllSpecs --randomizeSuites --race --trace
 
