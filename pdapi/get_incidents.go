@@ -11,6 +11,12 @@ import (
 	"pdcli/models"
 )
 
+type result struct {
+	Incidents []models.Incident
+}
+
+type emptyResult []models.Incident
+
 // GetIncidents - requests the incidents from PD service
 func GetIncidents(ctx *config.AppContext, options map[string]string) []models.Incident {
 	apiURL := baseURL + "/incidents"
@@ -23,23 +29,22 @@ func GetIncidents(ctx *config.AppContext, options map[string]string) []models.In
 	)
 
 	res, getErr := client.Do(request)
-	result := struct{ Incidents []models.Incident }{[]models.Incident{}}
-
 	if getErr != nil {
 		*ctx.FailuresChannel <- getErr.Error()
-		return result.Incidents
+		return emptyResult{}
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
 		*ctx.FailuresChannel <- readErr.Error()
-		return result.Incidents
+		return emptyResult{}
 	}
 
-	jsonErr := json.Unmarshal(body, &result)
-	if jsonErr != nil {
+	result := result{}
+
+	if jsonErr := json.Unmarshal(body, &result); jsonErr != nil {
 		*ctx.FailuresChannel <- jsonErr.Error()
-		return result.Incidents
+		return emptyResult{}
 	}
 
 	return result.Incidents
