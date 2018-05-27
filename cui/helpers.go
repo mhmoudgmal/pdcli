@@ -44,13 +44,7 @@ func updateIncidentListBox(lb *ui.ListBox, incidentsItems []ui.Item) {
 }
 
 func updateIncidentStatus(lb *ui.ListBox, incidentsItems []ui.Item, incident models.Incident) {
-	itemIndex := -1
-
-	for idx, incidentItem := range incidentsItems {
-		if incidentItem.ItemVal == incident.ID {
-			itemIndex = idx
-		}
-	}
+	itemIndex := getItemIndex(incidentsItems, incident)
 
 	if itemIndex >= 0 {
 		lb.Items[itemIndex] = ui.Item{
@@ -59,4 +53,16 @@ func updateIncidentStatus(lb *ui.ListBox, incidentsItems []ui.Item, incident mod
 		}
 		ui.Render(lb)
 	}
+}
+
+func getItemIndex(incidentsItems []ui.Item, incident models.Incident) int {
+	itemIndex := -1
+
+	for idx, incidentItem := range incidentsItems {
+		if incidentItem.ItemVal == incident.ID {
+			itemIndex = idx
+		}
+	}
+
+	return itemIndex
 }
