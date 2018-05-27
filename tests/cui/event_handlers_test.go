@@ -50,7 +50,11 @@ var _ = Describe("Events", func() {
 		}
 	})
 
-	testCommand(&ctx, map[string]string{"cmd": "C-k", "path": "/sys/kbd/C-k", "msg": "sends ACKNOWLEDGED message to PDUpdating chan"}, func() {
+	testCommand(&ctx, map[string]string{
+		"cmd":  "C-k",
+		"path": "/sys/kbd/C-k",
+		"msg":  "sends ACKNOWLEDGED message to PDUpdating chan",
+	}, func() {
 		Eventually(*ctx.PDUpdatingChannel).Should(Receive(Equal(models.IncidentUpdateInfo{
 			ID:     "Item1",
 			From:   pdcfg.Email,
@@ -58,7 +62,11 @@ var _ = Describe("Events", func() {
 		})))
 	})
 
-	testCommand(&ctx, map[string]string{"cmd": "C-r", "path": "/sys/kbd/C-r", "msg": "sends RESOLVED message to PDUpdating chan"}, func() {
+	testCommand(&ctx, map[string]string{
+		"cmd":  "C-r",
+		"path": "/sys/kbd/C-r",
+		"msg":  "sends RESOLVED message to PDUpdating chan",
+	}, func() {
 		Eventually(*ctx.PDUpdatingChannel).Should(Receive(Equal(models.IncidentUpdateInfo{
 			ID:     "Item1",
 			From:   pdcfg.Email,
@@ -66,7 +74,11 @@ var _ = Describe("Events", func() {
 		})))
 	})
 
-	testCommand(&ctx, map[string]string{"cmd": "C-c", "path": "/sys/kbd/C-c", "msg": "sends TERM & STOPFREQUESTING messages"}, func() {
+	testCommand(&ctx, map[string]string{
+		"cmd":  "C-c",
+		"path": "/sys/kbd/C-c",
+		"msg":  "sends TERM & STOPFREQUESTING messages",
+	}, func() {
 		Eventually(*ctx.TermChannel).Should(Receive(Equal(true)))
 		Eventually(*ctx.StopFrequestingChannel).Should(Receive(Equal(true)))
 	})
