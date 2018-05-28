@@ -53,12 +53,12 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 		ui.Render(ui.Body)
 	})
 
-	ui.Handle("/sys/kbd/<up>", func(ui.Event) {
+	ui.Handle("/sys/kbd/k", func(ui.Event) {
 		wdgts.IncidentsWidget.Up()
 		ui.Render(wdgts.IncidentsWidget)
 	})
 
-	ui.Handle("/sys/kbd/<down>", func(ui.Event) {
+	ui.Handle("/sys/kbd/j", func(ui.Event) {
 		wdgts.IncidentsWidget.Down()
 		ui.Render(wdgts.IncidentsWidget)
 	})
