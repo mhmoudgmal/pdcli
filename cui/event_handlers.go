@@ -41,9 +41,12 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 
 		wdgts.ModeWidget.Label = ctx.Mode.Code
 		wdgts.ModeWidget.BarColor = ctx.Mode.Color
-		wdgts.ModeTextNoteWidget.Text = ctx.Mode.Note
 
 		ui.Render(ui.Body)
+	})
+
+	ui.Handle("/sys/kbd/C-v", func(ui.Event) {
+		*ctx.PDGetIncidentChannel <- wdgts.IncidentsWidget.Current().ItemVal
 	})
 
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {

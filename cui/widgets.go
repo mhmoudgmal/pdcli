@@ -3,7 +3,7 @@ package cui
 import (
 	ui "github.com/pdevine/termui"
 
-	. "pdcli/config"
+	"pdcli/config"
 )
 
 func helpWidget() *ui.Par {
@@ -12,6 +12,7 @@ C-c     Quit
 C-t     Toggle Auto-Ack mode
 C-k     Acknowledge selected incident
 C-r     Resolve selected incident
+C-v     Show the details of the selected incident
 
 [⬤](fg-green)  Resolved [⬤](fg-yellow)  Acknowledged [⬤](fg-red)  Triggered
 `
@@ -25,28 +26,24 @@ C-r     Resolve selected incident
 	return helpWidget
 }
 
-func modeWidget(cfg *AppContext) *ui.Gauge {
+func modeWidget(cfg *config.AppContext) *ui.Gauge {
 	modeWidget := ui.NewGauge()
 	modeWidget.Percent = 100
 	modeWidget.Label = cfg.Mode.Code
 	modeWidget.BarColor = cfg.Mode.Color
 	modeWidget.PercentColorHighlighted = ui.ColorDefault
-	modeWidget.Width = 50
-	modeWidget.Y = 11
-	modeWidget.BorderFg = ui.ColorRed
-	modeWidget.BorderLabelFg = ui.ColorCyan
-	modeWidget.BorderLabel = "Mode"
 
 	return modeWidget
 }
 
-func modeTextNoteWidget(cfg *AppContext) *ui.Par {
-	modeTextNoteWidget := ui.NewPar(cfg.Mode.Note)
-	modeTextNoteWidget.Border = false
-	modeTextNoteWidget.Height = 4
-	modeTextNoteWidget.TextFgColor = ui.ColorWhite
+func onCallStatusWidget(cfg *config.AppContext) *ui.Gauge {
+	onCallStatusWidget := ui.NewGauge()
+	onCallStatusWidget.Percent = 100
+	onCallStatusWidget.Label = "..."
+	onCallStatusWidget.BarColor = ui.ColorDefault
+	onCallStatusWidget.PercentColorHighlighted = ui.ColorDefault
 
-	return modeTextNoteWidget
+	return onCallStatusWidget
 }
 
 func incidentsWidget() *ui.ListBox {
@@ -62,9 +59,18 @@ func incidentsWidget() *ui.ListBox {
 	return incidentsListBox
 }
 
+func incidentDetailsWidget() *ui.Table {
+	incidentDetails := ui.NewTable()
+	incidentDetails.Border = true
+	incidentDetails.TextAlign = ui.AlignCenter
+	return incidentDetails
+}
+
+// Widgets ...
 type Widgets struct {
-	HelpWidget         *ui.Par
-	ModeWidget         *ui.Gauge
-	IncidentsWidget    *ui.ListBox
-	ModeTextNoteWidget *ui.Par
+	HelpWidget            *ui.Par
+	ModeWidget            *ui.Gauge
+	IncidentsWidget       *ui.ListBox
+	OnCallStatusWidget    *ui.Gauge
+	IncidentDetailsWidget *ui.Table
 }

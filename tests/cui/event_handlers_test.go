@@ -20,7 +20,13 @@ func testCommand(ctx *config.AppContext, commandOpts map[string]string, expect f
 		}
 		incidentsWdgtMock.Selected = 0
 
-		wdgts := cui.Widgets{nil, nil, incidentsWdgtMock, nil}
+		wdgts := cui.Widgets{
+			HelpWidget:            nil,
+			ModeWidget:            nil,
+			OnCallStatusWidget:    nil,
+			IncidentDetailsWidget: nil,
+			IncidentsWidget:       incidentsWdgtMock,
+		}
 
 		It(commandOpts["msg"], func() {
 			cui.HandleEvents(ctx, wdgts)

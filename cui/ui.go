@@ -4,6 +4,7 @@ import (
 	ui "github.com/pdevine/termui"
 
 	"pdcli/config"
+	. "pdcli/cui/helpers"
 )
 
 // InitUI Initializes the app CUI
@@ -19,26 +20,29 @@ func InitUI(ctx *config.AppContext) {
 		helpWidget(),
 		modeWidget(ctx),
 		incidentsWidget(),
-		modeTextNoteWidget(ctx),
+		onCallStatusWidget(ctx),
+		incidentDetailsWidget(),
 	}
 
 	// build cui
 	ui.Body.AddRows(
 		ui.NewRow(
-			ui.NewRow(
-				ui.NewCol(6, 0, widgets.HelpWidget),
-				ui.NewCol(6, 0, ui.NewRow(
-					ui.NewRow(
-						ui.NewCol(12, 0, widgets.ModeWidget, widgets.ModeTextNoteWidget)))))),
+			ui.NewCol(6, 0, widgets.HelpWidget),
+			ui.NewCol(6, 0, widgets.OnCallStatusWidget, widgets.ModeWidget),
+		),
 		ui.NewRow(
-			ui.NewCol(6, 0, widgets.IncidentsWidget)))
+			ui.NewCol(6, 0, widgets.IncidentsWidget),
+			ui.NewCol(6, 0, widgets.IncidentDetailsWidget),
+		),
+	)
 
 	// calculate layout and render
 	ui.Body.Align()
 	ui.Render(ui.Body)
 
 	go HandleEvents(ctx, widgets)
-	go updateIncidentsWidget(ctx, widgets.IncidentsWidget)
+	go UpdateIncidentsWidget(ctx, widgets.IncidentsWidget)
+	go UpdateIncidentDetailsWidget(ctx, widgets.IncidentDetailsWidget)
 
 	ui.Loop()
 }
