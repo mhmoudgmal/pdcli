@@ -4,6 +4,8 @@ import (
 	"flag"
 	"time"
 
+	ui "github.com/pdevine/termui"
+
 	"pdcli/config"
 	"pdcli/cui"
 	"pdcli/models"
@@ -41,4 +43,5 @@ func main() {
 	go PDWorker(&ctx)
 
 	<-term
+	ui.Clear()
 }
