@@ -34,7 +34,18 @@ func PDWorker(ctx *config.AppContext) {
 		for {
 			select {
 			case updateIncidentInfo := <-*ctx.PDUpdatingChannel:
-				*ctx.UpdateStatusChannel <- pdapi.UpdateIncident(ctx, updateIncidentInfo)
+				incident := pdapi.UpdateIncident(ctx, updateIncidentInfo)
+				*ctx.UpdateStatusChannel <- incident
+				*ctx.IncidentDetailsChannel <- incident
+			}
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case incidentID := <-*ctx.PDGetIncidentChannel:
+				*ctx.IncidentDetailsChannel <- pdapi.GetIncident(ctx, incidentID)
 			}
 		}
 	}()
