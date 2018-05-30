@@ -18,15 +18,9 @@ func testCommand(ctx *config.AppContext, commandOpts map[string]string, expect f
 				Text:    "Item1 Text",
 			}},
 		}
-		incidentsWdgtMock.Selected = 0
 
-		wdgts := cui.Widgets{
-			HelpWidget:            nil,
-			ModeWidget:            nil,
-			OnCallStatusWidget:    nil,
-			IncidentDetailsWidget: nil,
-			IncidentsWidget:       incidentsWdgtMock,
-		}
+		incidentsWdgtMock.Selected = 0
+		wdgts := cui.Widgets{IncidentsWidget: incidentsWdgtMock}
 
 		It(commandOpts["msg"], func() {
 			cui.HandleEvents(ctx, wdgts)
@@ -46,6 +40,7 @@ var _ = Describe("Events", func() {
 		updatingChan := make(chan models.IncidentUpdateInfo)
 		termChan := make(chan bool)
 		stopFreqChan := make(chan bool)
+		pdGetIChan := make(chan string)
 
 		pdcfg = config.PDConfig{Token: "token", Email: "foo@bar.baz"}
 		ctx = config.AppContext{
@@ -53,6 +48,7 @@ var _ = Describe("Events", func() {
 			PDConfig:               &pdcfg,
 			TermChannel:            &termChan,
 			StopFrequestingChannel: &stopFreqChan,
+			PDGetIncidentChannel:   &pdGetIChan,
 		}
 	})
 
@@ -78,6 +74,14 @@ var _ = Describe("Events", func() {
 			From:   pdcfg.Email,
 			Status: models.RESOLVED,
 		})))
+	})
+
+	testCommand(&ctx, map[string]string{
+		"cmd":  "C-v",
+		"path": "/sys/kbd/C-v",
+		"msg":  "sends message to PDGetIncident chan",
+	}, func() {
+		Eventually(*ctx.PDGetIncidentChannel).Should(Receive(Equal("Item1")))
 	})
 
 	testCommand(&ctx, map[string]string{
