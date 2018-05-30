@@ -25,7 +25,7 @@ type Incident struct {
 	Urgency        string `json:"urgency"`
 	HTMLURL        string `json:"html_url"`
 	Status         string `json:"status"`
-	Service
+	Service        `json:"service"`
 }
 
 // Service minimal representation
