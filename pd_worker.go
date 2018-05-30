@@ -8,7 +8,8 @@ import (
 	"pdcli/pdapi"
 )
 
-// PDWorker - starts a ticker every 2/? seconds gets incidents if any and sends the result through IncidentsChannel,
+// PDWorker .. starts a ticker asking for incidents every 2/? seconds,
+// Sends the result through IncidentsChannel.
 // Auto Acknowledge the incidents if the auto-ack mode is enabled.
 func PDWorker(ctx *config.AppContext) {
 	go func() {
