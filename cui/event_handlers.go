@@ -7,12 +7,21 @@ import (
 	. "pdcli/models"
 )
 
+// Render ...
+// As long as ui.Render is blocking, this is one way -
+// to make it easy to test different evetns.
+// @see.. tests/cui/event_handlers_test.go
+var Render = ui.Render
+var StopLoop = ui.StopLoop
+
 // HandleEvents handls the kyboard commands.
 //
-// C-k ---> Ack!
-// C-r ---> Resolve!
-// C-t ---> Toggle Auto-Ack mode
-// C-c ---> Close app
+// j   --- navigate down
+// k   --- navigate up
+// C-k --- acknowledge incident
+// C-r --- resolve incident
+// C-t --- toggle auto-ack mode
+// C-c --- close app
 func HandleEvents(ctx *AppContext, wdgts Widgets) {
 
 	// send an "acknowledge" message to the PD updating channel
@@ -41,32 +50,35 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 
 		wdgts.ModeWidget.Label = ctx.Mode.Code
 		wdgts.ModeWidget.BarColor = ctx.Mode.Color
-		wdgts.ModeTextNoteWidget.Text = ctx.Mode.Note
 
-		ui.Render(ui.Body)
+		Render(ui.Body)
+	})
+
+	ui.Handle("/sys/kbd/C-v", func(ui.Event) {
+		*ctx.PDGetIncidentChannel <- wdgts.IncidentsWidget.Current().ItemVal
 	})
 
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {
 		ui.Body.Width = ui.TermWidth()
 		ui.Body.Align()
 		ui.Clear()
-		ui.Render(ui.Body)
+		Render(ui.Body)
 	})
 
 	ui.Handle("/sys/kbd/k", func(ui.Event) {
 		wdgts.IncidentsWidget.Up()
-		ui.Render(wdgts.IncidentsWidget)
+		Render(wdgts.IncidentsWidget)
 	})
 
 	ui.Handle("/sys/kbd/j", func(ui.Event) {
 		wdgts.IncidentsWidget.Down()
-		ui.Render(wdgts.IncidentsWidget)
+		Render(wdgts.IncidentsWidget)
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
 		*ctx.TermChannel <- true
 		*ctx.StopFrequestingChannel <- true
-		ui.StopLoop()
+		StopLoop()
 	})
 
 }
