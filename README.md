@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/mhmoudgmal/pdcli.svg?branch=master)](https://travis-ci.org/mhmoudgmal/pdcli)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mhmoudgmal/pdcli)](https://goreportcard.com/report/github.com/mhmoudgmal/pdcli)
+[![Build Status](https://travis-ci.org/mhmoudgmal/PD.cli.svg?branch=master)](https://travis-ci.org/mhmoudgmal/PD.cli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mhmoudgmal/PD.cli)](https://goreportcard.com/report/github.com/mhmoudgmal/PD.cli)
 [![Generic badge](https://img.shields.io/badge/editor-vim-yellowgreen.svg)](https://shields.io/)
 
 PagerDuty CLI **(Under development)**
 
 ## Development
-- clone the project `git clone git@github.com:mhmoudgmal/pdcli.git`
+- clone the project `git clone git@github.com:mhmoudgmal/PD.cli.git pdcli`
 - install go dep tool `go get -u github.com/golang/dep/cmd/dep`
 - run `dep ensure`
 
