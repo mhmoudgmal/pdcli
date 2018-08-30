@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/mhmoudgmal/PD.cli.svg?branch=master)](https://travis-ci.org/mhmoudgmal/PD.cli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mhmoudgmal/PD.cli)](https://goreportcard.com/report/github.com/mhmoudgmal/PD.cli)
-[![Generic badge](https://img.shields.io/badge/editor-vim-yellowgreen.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/editor-vim-yellowgreen.svg)](https://github.com/mhmoudgmal/PD.cli)
 
 PagerDuty CLI **(Under development)**
 
