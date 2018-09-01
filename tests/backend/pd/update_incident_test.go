@@ -1,37 +1,39 @@
-package pdapi_test
+package pd_test
 
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/h2non/gock.v1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
 
-	"pdcli/config"
-	"pdcli/models"
-	"pdcli/pdapi"
+	. "pdcli/backend/pd"
+	. "pdcli/backend/pd/models"
+	. "pdcli/i"
 )
 
-var _ = Describe("pdapi", func() {
+var _ = Describe("PD Backend API", func() {
 	Describe("UpdateIncident", func() {
 		var failuresChannel chan string
-		var ctx config.AppContext
-		var incident struct{ Incident models.Incident }
+		var ctx AppContext
+		var incident struct{ Incident PDIncident }
 		var incidentString string
 
 		BeforeEach(func() {
 			failuresChannel = make(chan string)
 
-			ctx = config.AppContext{
+			ctx = AppContext{
 				FailuresChannel: &failuresChannel,
-				PDConfig: &config.PDConfig{
-					Email: "foo@bar.baz",
-					Token: "pd_token",
+				Backend: Backend{
+					Config{
+						Email: "foo@bar.baz",
+						Token: "pd_token",
+					},
 				},
 			}
 
-			incident = struct{ Incident models.Incident }{models.Incident{}}
+			incident = struct{ Incident PDIncident }{}
 
 			incidentString = `{
 				"incident": {
@@ -47,32 +49,33 @@ var _ = Describe("pdapi", func() {
 						}
 					}`
 
-			json.Unmarshal([]byte(fmt.Sprintf(incidentString, "triggered")), &incident)
+			json.Unmarshal([]byte(fmt.Sprintf(incidentString, TRIGGERED)), &incident)
 		})
 
 		Context("when request succeeds", func() {
-			var resultIncident models.Incident
+			var resultIncident IIncident
 
 			JustBeforeEach(func() {
-				gock.New("https://api.pagerduty.com/incidents/"+incident.Incident.ID).
+				gock.New("https://api.pagerduty.com/incidents/"+incident.Incident.GetID()).
 					HeaderPresent("Authorization").
 					MatchHeader("Content-Type", "application/json").
 					MatchHeader("Accept", `application/vnd.pagerduty\+json;version=2`).
 					Put("/").
 					Reply(200).
-					BodyString(fmt.Sprintf(incidentString, "acknowledged"))
+					BodyString(fmt.Sprintf(incidentString, ACKNOWLEDGED))
 
-				resultIncident = pdapi.UpdateIncident(
-					&ctx, models.IncidentUpdateInfo{
-						ID:     incident.Incident.ID,
-						From:   ctx.PDConfig.Email,
-						Status: "acknowledged",
+				resultIncident = ctx.Backend.UpdateIncident(
+					&ctx,
+					UpdateIncidentInfo{
+						ID:     incident.Incident.GetID(),
+						Status: ACKNOWLEDGED,
+						Config: ctx.Backend,
 					},
 				)
 			})
 
 			It("returns the updated incident", func() {
-				Expect(resultIncident.Status).To(Equal("acknowledged"))
+				Expect(resultIncident.GetStatus()).To(Equal(ACKNOWLEDGED))
 				Expect(gock.IsDone()).To(Equal(true))
 			})
 
@@ -84,15 +87,15 @@ var _ = Describe("pdapi", func() {
 
 		Context("when bad request", func() {
 			It("sends error message through the failures channel", func() {
-				gock.New("https://api.pagerduty.com/incidents/" + incident.Incident.ID).
+				gock.New("https://api.pagerduty.com/incidents/" + incident.Incident.GetID()).
 					Put("/").
 					Reply(400)
 
-				go pdapi.UpdateIncident(
-					&ctx, models.IncidentUpdateInfo{
-						ID:     incident.Incident.ID,
-						From:   ctx.PDConfig.Email,
-						Status: "acknowledged",
+				go ctx.Backend.UpdateIncident(
+					&ctx, UpdateIncidentInfo{
+						ID:     incident.Incident.GetID(),
+						Status: ACKNOWLEDGED,
+						Config: ctx.Backend,
 					},
 				)
 

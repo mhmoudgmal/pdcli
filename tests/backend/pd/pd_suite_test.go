@@ -1,4 +1,4 @@
-package pdapi_test
+package pd_test
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ var _ = BeforeSuite(func() {
 	defer gock.DisableNetworking()
 })
 
-func TestPDApis(t *testing.T) {
+func TestPD(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "PDApis Suite")
+	RunSpecs(t, "PD Backend")
 }

@@ -1,30 +1,32 @@
-package pdapi_test
+package pd_test
 
 import (
 	"encoding/json"
+	"gopkg.in/h2non/gock.v1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
 
-	"pdcli/config"
-	"pdcli/models"
-	"pdcli/pdapi"
+	. "pdcli/backend/pd"
+	. "pdcli/backend/pd/models"
+	. "pdcli/i"
 )
 
-var _ = Describe("pdapi", func() {
+var _ = Describe("PD Backend API", func() {
 	Describe("GetIncidents", func() {
 		var failuresChannel chan string
-		var ctx config.AppContext
+		var ctx AppContext
 
 		BeforeEach(func() {
 			failuresChannel = make(chan string)
 
-			ctx = config.AppContext{
+			ctx = AppContext{
 				FailuresChannel: &failuresChannel,
-				PDConfig: &config.PDConfig{
-					Email: "foo@bar.baz",
-					Token: "pd_token",
+				Backend: Backend{
+					Config{
+						Token: "pd_token",
+						Email: "foo@bar.baz",
+					},
 				},
 			}
 		})
@@ -57,17 +59,17 @@ var _ = Describe("pdapi", func() {
 			})
 
 			It("returns the incidents", func() {
-				result := struct{ Incidents []models.Incident }{[]models.Incident{}}
+				result := struct{ Incidents []PDIncident }{}
 
-				incidents := pdapi.GetIncidents(&ctx, map[string]string{})
+				incidents := ctx.Backend.GetIncidents(&ctx, map[string]string{})
 				json.Unmarshal([]byte(incidentsString), &result)
 
-				Expect(incidents).To(Equal(result.Incidents))
+				Expect(incidents[0].(PDIncident)).To(Equal(result.Incidents[0]))
 				Expect(gock.IsDone()).To(Equal(true))
 			})
 
 			It("does not send any messages to the failure chan", func() {
-				pdapi.GetIncidents(&ctx, map[string]string{})
+				ctx.Backend.GetIncidents(&ctx, map[string]string{})
 
 				Expect(*ctx.FailuresChannel).NotTo(Receive())
 				Expect(gock.IsDone()).To(Equal(true))
@@ -80,7 +82,7 @@ var _ = Describe("pdapi", func() {
 					Get("/").
 					Reply(400)
 
-				go pdapi.GetIncidents(&ctx, map[string]string{})
+				go ctx.Backend.GetIncidents(&ctx, map[string]string{})
 
 				Eventually(*ctx.FailuresChannel).Should(Receive(Equal("unexpected end of JSON input")))
 				Expect(gock.IsDone()).To(Equal(true))

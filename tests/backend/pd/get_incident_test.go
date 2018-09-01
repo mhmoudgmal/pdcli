@@ -1,30 +1,32 @@
-package pdapi_test
+package pd_test
 
 import (
 	"encoding/json"
+	"gopkg.in/h2non/gock.v1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/h2non/gock.v1"
 
-	"pdcli/config"
-	"pdcli/models"
-	"pdcli/pdapi"
+	. "pdcli/backend/pd"
+	. "pdcli/backend/pd/models"
+	. "pdcli/i"
 )
 
-var _ = Describe("pdapi", func() {
+var _ = Describe("PD backend API", func() {
 	Describe("GetIncident", func() {
 		var failuresChannel chan string
-		var ctx config.AppContext
+		var ctx AppContext
 
 		BeforeEach(func() {
 			failuresChannel = make(chan string)
 
-			ctx = config.AppContext{
+			ctx = AppContext{
 				FailuresChannel: &failuresChannel,
-				PDConfig: &config.PDConfig{
-					Email: "foo@bar.baz",
-					Token: "pd_token",
+				Backend: Backend{
+					Config{
+						Token: "pd_token",
+						Email: "foo@bar.baz",
+					},
 				},
 			}
 		})
@@ -57,9 +59,9 @@ var _ = Describe("pdapi", func() {
 			})
 
 			It("returns the incident", func() {
-				result := struct{ Incident models.Incident }{models.Incident{}}
+				result := struct{ Incident PDIncident }{}
 
-				incident := pdapi.GetIncident(&ctx, "PT4KHLK")
+				incident := ctx.Backend.GetIncident(&ctx, "PT4KHLK")
 				json.Unmarshal([]byte(incidentString), &result)
 
 				Expect(incident).To(Equal(result.Incident))
@@ -67,7 +69,7 @@ var _ = Describe("pdapi", func() {
 			})
 
 			It("does not send any messages to the failure chan", func() {
-				pdapi.GetIncident(&ctx, "PT4KHLK")
+				ctx.Backend.GetIncident(&ctx, "PT4KHLK")
 
 				Expect(*ctx.FailuresChannel).NotTo(Receive())
 				Expect(gock.IsDone()).To(Equal(true))
@@ -79,7 +81,7 @@ var _ = Describe("pdapi", func() {
 				Get("/").
 				Reply(400)
 
-			go pdapi.GetIncident(&ctx, "")
+			go ctx.Backend.GetIncident(&ctx, "")
 
 			Eventually(*ctx.FailuresChannel).Should(Receive(Equal("unexpected end of JSON input")))
 			Expect(gock.IsDone()).To(Equal(true))
