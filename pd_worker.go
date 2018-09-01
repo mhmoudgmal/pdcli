@@ -3,29 +3,37 @@ package main
 import (
 	"time"
 
-	"pdcli/config"
-	"pdcli/models"
-	"pdcli/pdapi"
+	. "pdcli/i"
 )
 
-// PDWorker .. starts a ticker asking for incidents every 2/? seconds,
-// Sends the result through IncidentsChannel.
+// PDWorker ..starts a ticker asking for incidents every 2/? seconds,
+// Sends the result through the IncidentsChannel.
 // Auto Acknowledge the incidents if the auto-ack mode is enabled.
-func PDWorker(ctx *config.AppContext) {
+func PDWorker(ctx *AppContext) {
+	incidentsBackend := ctx.Backend
+
 	go func() {
 		params := map[string]string{"since": ""}
 
 		for _ = range time.Tick(ctx.FrequestDuration) {
-			incidents := pdapi.GetIncidents(ctx, params)
+			incidents := incidentsBackend.GetIncidents(ctx, params)
 
-			if len(incidents) > 0 {
-				t, _ := time.Now().MarshalText()
-				params["since"] = string(t)
+			t, _ := time.Now().MarshalText()
+			params["since"] = string(t)
 
-				*ctx.IncidentsChannel <- incidents
+			if len(incidents) == 0 {
+				continue
+			}
 
-				if ctx.Mode.Code == config.ModeA.Code {
-					autoAck(ctx, incidents)
+			ctx.Notifiable.Notify("new-incidents", incidents)
+
+			if ctx.Mode.Code == ModeA.Code {
+				for _, incident := range incidents {
+					Ack(
+						incident,
+						ctx.UpdateBackendChannel,
+						ctx.Backend,
+					)
 				}
 			}
 		}
@@ -34,10 +42,10 @@ func PDWorker(ctx *config.AppContext) {
 	go func() {
 		for {
 			select {
-			case updateIncidentInfo := <-*ctx.PDUpdatingChannel:
-				incident := pdapi.UpdateIncident(ctx, updateIncidentInfo)
-				*ctx.UpdateStatusChannel <- incident
-				*ctx.IncidentDetailsChannel <- incident
+			case updateIncidentInfo := <-*ctx.UpdateBackendChannel:
+				incident := incidentsBackend.UpdateIncident(ctx, updateIncidentInfo)
+				ctx.Notifiable.Notify("updated-incident", incident)
+				ctx.Notifiable.Notify("detailed-incident", incident)
 			}
 		}
 	}()
@@ -45,17 +53,12 @@ func PDWorker(ctx *config.AppContext) {
 	go func() {
 		for {
 			select {
-			case incidentID := <-*ctx.PDGetIncidentChannel:
-				*ctx.IncidentDetailsChannel <- pdapi.GetIncident(ctx, incidentID)
+			case incidentID := <-*ctx.GetIncidentChannel:
+				incident := incidentsBackend.GetIncident(ctx, incidentID)
+				ctx.Notifiable.Notify("detailed-incident", incident)
 			}
 		}
 	}()
 
 	<-*ctx.StopFrequestingChannel
-}
-
-func autoAck(ctx *config.AppContext, incidents []models.Incident) {
-	for _, incident := range incidents {
-		incident.Ack(ctx.PDUpdatingChannel, ctx.PDConfig.Email)
-	}
 }

@@ -4,48 +4,96 @@ import (
 	"flag"
 	"time"
 
-	ui "github.com/pdevine/termui"
+	pd "pdcli/backend/pd"
 
-	"pdcli/config"
-	"pdcli/cui"
-	"pdcli/models"
+	. "pdcli/i"
+	. "pdcli/notifiable/Cui"
 )
 
 var (
-	term                    = make(chan bool)                      // application terminate.
-	stopFrequesting         = make(chan bool)                      // stop requesting pd api.
-	failuresChannel         = make(chan string)                    // send failure message when something goes wrong.
-	incidentsChannel        = make(chan []models.Incident)         // pass incidents between different application parts whenever you have one.
-	updateStatusChannel     = make(chan models.Incident)           // pass incident when it is updated, to update other parts in the application.
-	incidentDetailsChannel  = make(chan models.Incident)           // pass incident details between different application parts whenever you have one.
-	getIncidentChannel      = make(chan string)                    // pass incident id to get the corresponding incident details from PD.
-	incidentUpdatingChannel = make(chan models.IncidentUpdateInfo) // send incident update message for updating the incident status.
+	reqInterval            = 2 * time.Second
+	stopFrequesting        = make(chan bool)
+	terminateChannel       = make(chan bool)
+	failuresChannel        = make(chan string)
+	getIncidentChannel     = make(chan string)
+	updateStatusChannel    = make(chan IIncident)
+	incidentDetailsChannel = make(chan IIncident)
+	incidentsChannel       = make(chan IIncidents)
+	updateIncidentChannel  = make(chan UpdateIncidentInfo)
 )
 
 func main() {
-	// TODO: refactor and extract flags/options to different package, and also support to read/serialize the options vlaues from/to file.
+	backend := flag.String("backend", "pagerduty", "Incident managment backend")
+	notifiable := flag.String("notifiable", "cui", "Incident Notifiable")
+
+	// required by pd backend.
 	email := flag.String("email", "", "Your pagerduty account email")
 	token := flag.String("token", "", "Your pagerduty api access token")
 
 	flag.Parse()
 
-	ctx := config.AppContext{
-		Mode:                   &config.ModeM,
-		PDConfig:               &config.PDConfig{Token: *token, Email: *email},
-		TermChannel:            &term,
+	var (
+		ctx                AppContext
+		incidentBackend    IncidentBackend
+		incidentNotifiable IncidentNotifiable
+	)
+
+	incidentBackend = backendFor(
+		*backend,
+		map[string]string{
+			"token": *token,
+			"email": *email,
+		},
+	)
+	incidentNotifiable = notifiableFor(*notifiable, &ctx)
+
+	ctx = AppContext{
+		Backend:                incidentBackend,
+		Notifiable:             incidentNotifiable,
+		FrequestDuration:       reqInterval,
+		Mode:                   ModeN,
 		FailuresChannel:        &failuresChannel,
-		FrequestDuration:       2 * time.Second,
+		TerminateChannel:       &terminateChannel,
 		IncidentsChannel:       &incidentsChannel,
-		PDUpdatingChannel:      &incidentUpdatingChannel,
+		UpdateBackendChannel:   &updateIncidentChannel,
 		UpdateStatusChannel:    &updateStatusChannel,
 		IncidentDetailsChannel: &incidentDetailsChannel,
-		PDGetIncidentChannel:   &getIncidentChannel,
+		GetIncidentChannel:     &getIncidentChannel,
 		StopFrequestingChannel: &stopFrequesting,
 	}
 
-	go cui.InitUI(&ctx)
+	go incidentNotifiable.Init(&ctx)
 	go PDWorker(&ctx)
 
-	<-term
-	ui.Clear()
+	<-*ctx.TerminateChannel
+	incidentNotifiable.Clean()
+}
+
+func backendFor(b string, opts map[string]string) IncidentBackend {
+	switch b {
+	case "pagerduty":
+		return pd.Backend{
+			pd.Config{
+				Token: opts["token"],
+				Email: opts["email"],
+			},
+		}
+	case "victorops":
+		panic("vectorops backend is not supported yet!")
+	default:
+		panic("backend is not supported")
+	}
+}
+
+func notifiableFor(n string, ctx *AppContext) IncidentNotifiable {
+	switch n {
+	case "cui":
+		return Cui{
+			AppContext: ctx,
+		}
+	case "siren":
+		panic("Siren notifiaction is not supported yet!")
+	default:
+		panic("notifiable is not supported")
+	}
 }

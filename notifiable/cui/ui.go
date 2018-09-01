@@ -3,12 +3,12 @@ package cui
 import (
 	ui "github.com/pdevine/termui"
 
-	"pdcli/config"
-	. "pdcli/cui/helpers"
+	. "pdcli/i"
+	. "pdcli/notifiable/cui/helpers"
 )
 
-// InitUI Initializes the app CUI
-func InitUI(ctx *config.AppContext) {
+// Init Initializes the app CUI
+func (Cui) Init(ctx *AppContext) {
 	defer ui.Close()
 
 	if err := ui.Init(); err != nil {
@@ -20,7 +20,7 @@ func InitUI(ctx *config.AppContext) {
 		helpWidget(),
 		modeWidget(ctx),
 		incidentsWidget(),
-		onCallStatusWidget(ctx),
+		onCallStatusWidget(),
 		incidentDetailsWidget(),
 	}
 
@@ -45,4 +45,9 @@ func InitUI(ctx *config.AppContext) {
 	go UpdateIncidentDetailsWidget(ctx, widgets.IncidentDetailsWidget)
 
 	ui.Loop()
+}
+
+// Clean cleans after you
+func (Cui) Clean() {
+	ui.Clear()
 }

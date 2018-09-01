@@ -3,12 +3,11 @@ package helpers
 import (
 	ui "github.com/pdevine/termui"
 
-	"pdcli/config"
-	"pdcli/models"
+	. "pdcli/i"
 )
 
 // UpdateIncidentsWidget ...
-func UpdateIncidentsWidget(ctx *config.AppContext, lb *ui.ListBox) {
+func UpdateIncidentsWidget(ctx *AppContext, lb *ui.ListBox) {
 	incidentsItems := []ui.Item{}
 
 	for {
@@ -23,14 +22,14 @@ func UpdateIncidentsWidget(ctx *config.AppContext, lb *ui.ListBox) {
 	}
 }
 
-func mapIncidentsToUIItems(incidents []models.Incident) []ui.Item {
+func mapIncidentsToUIItems(incidents IIncidents) []ui.Item {
 	incidentsItems := []ui.Item{}
 
 	for _, incident := range incidents {
 		incidentsItems = append(
 			incidentsItems, ui.Item{
-				ItemVal: incident.ID,
-				Text:    incident.Inspect(),
+				ItemVal: incident.GetID(),
+				Text:    Inspect(incident),
 			},
 		)
 	}
@@ -44,23 +43,23 @@ func updateIncidentListBox(lb *ui.ListBox, incidentsItems []ui.Item) {
 	ui.Render(lb)
 }
 
-func updateIncidentStatus(lb *ui.ListBox, incidentsItems []ui.Item, incident models.Incident) {
+func updateIncidentStatus(lb *ui.ListBox, incidentsItems []ui.Item, incident IIncident) {
 	itemIndex := getItemIndex(incidentsItems, incident)
 
 	if itemIndex >= 0 {
 		lb.Items[itemIndex] = ui.Item{
-			ItemVal: incident.ID,
-			Text:    incident.Inspect(),
+			ItemVal: incident.GetID(),
+			Text:    Inspect(incident),
 		}
 		ui.Render(lb)
 	}
 }
 
-func getItemIndex(incidentsItems []ui.Item, incident models.Incident) int {
+func getItemIndex(incidentsItems []ui.Item, incident IIncident) int {
 	itemIndex := -1
 
 	for idx, incidentItem := range incidentsItems {
-		if incidentItem.ItemVal == incident.ID {
+		if incidentItem.ItemVal == incident.GetID() {
 			itemIndex = idx
 		}
 	}

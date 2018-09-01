@@ -3,16 +3,16 @@ package cui
 import (
 	ui "github.com/pdevine/termui"
 
-	"pdcli/config"
+	. "pdcli/i"
 )
 
 func helpWidget() *ui.Par {
 	helpWidgetText := `
-C-c     Quit
-C-t     Toggle Auto-Ack mode
-C-k     Acknowledge selected incident
-C-r     Resolve selected incident
-C-v     Show the details of the selected incident
+C-c   Quit
+C-t   Toggle Auto-Ack mode
+C-k   Acknowledge selected incident
+C-r   Resolve selected incident
+C-v   Show the details of the selected incident
 
 [⬤](fg-green)  Resolved [⬤](fg-yellow)  Acknowledged [⬤](fg-red)  Triggered
 `
@@ -26,20 +26,20 @@ C-v     Show the details of the selected incident
 	return helpWidget
 }
 
-func modeWidget(cfg *config.AppContext) *ui.Gauge {
+func modeWidget(ctx *AppContext) *ui.Gauge {
 	modeWidget := ui.NewGauge()
 	modeWidget.Percent = 100
-	modeWidget.Label = cfg.Mode.Code
-	modeWidget.BarColor = cfg.Mode.Color
+	modeWidget.Label = ctx.Mode.Code
+	modeWidget.BarColor = ctx.Mode.Color
 	modeWidget.PercentColorHighlighted = ui.ColorDefault
 
 	return modeWidget
 }
 
-func onCallStatusWidget(cfg *config.AppContext) *ui.Gauge {
+func onCallStatusWidget() *ui.Gauge {
 	onCallStatusWidget := ui.NewGauge()
 	onCallStatusWidget.Percent = 100
-	onCallStatusWidget.Label = "..."
+	onCallStatusWidget.Label = "Currently off call"
 	onCallStatusWidget.BarColor = ui.ColorDefault
 	onCallStatusWidget.PercentColorHighlighted = ui.ColorDefault
 

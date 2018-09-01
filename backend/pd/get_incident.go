@@ -1,45 +1,37 @@
-package pdapi
+package pd
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
-	"pdcli/config"
-	"pdcli/models"
+	. "pdcli/backend/pd/models"
+	. "pdcli/i"
 )
 
-type iResult struct {
-	Incident models.Incident
-}
-
 // GetIncident - requests incident information from PD service
-func GetIncident(ctx *config.AppContext, id string) models.Incident {
-	apiURL := baseURL + "/incidents/" + id
+func (Backend) GetIncident(ctx *AppContext, id string) IIncident {
+	resourceURL := baseURL + "/incidents/" + id
 
-	client, request := APIRequest(
-		ctx,
-		http.MethodGet,
-		apiURL,
-		nil,
-	)
+	client, request := HTTPRequest(ctx, http.MethodGet, resourceURL, nil)
 
 	res, getErr := client.Do(request)
 	if getErr != nil {
 		*ctx.FailuresChannel <- getErr.Error()
-		return models.Incident{}
+		return PDIncident{}
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
 		*ctx.FailuresChannel <- readErr.Error()
-		return models.Incident{}
+		return PDIncident{}
 	}
 
-	result := iResult{}
+	result := struct{ Incident PDIncident }{}
+
 	if jsonErr := json.Unmarshal(body, &result); jsonErr != nil {
 		*ctx.FailuresChannel <- jsonErr.Error()
-		return models.Incident{}
+		return PDIncident{}
 	}
 
 	return result.Incident

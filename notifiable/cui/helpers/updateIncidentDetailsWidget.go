@@ -3,12 +3,11 @@ package helpers
 import (
 	ui "github.com/pdevine/termui"
 
-	"pdcli/config"
-	"pdcli/models"
+	. "pdcli/i"
 )
 
 // UpdateIncidentDetailsWidget ...
-func UpdateIncidentDetailsWidget(ctx *config.AppContext, iDWidget *ui.Table) {
+func UpdateIncidentDetailsWidget(ctx *AppContext, iDWidget *ui.Table) {
 	for {
 		select {
 		case incident := <-*ctx.IncidentDetailsChannel:
@@ -17,17 +16,17 @@ func UpdateIncidentDetailsWidget(ctx *config.AppContext, iDWidget *ui.Table) {
 	}
 }
 
-func mapIncidentDetailsToUI(incident models.Incident, table *ui.Table) {
+func mapIncidentDetailsToUI(incident IIncident, table *ui.Table) {
 	data := [][]string{
-		[]string{"Status", incident.Status},
-		[]string{"Severity", incident.Urgency},
-		[]string{"Summary", incident.Description},
-		[]string{"Created", incident.CreatedAt},
-		[]string{"Service", incident.Service.Summary},
+		[]string{"Status", incident.GetStatus()},
+		[]string{"Severity", incident.GetUrgency()},
+		[]string{"Summary", incident.GetDescription()},
+		[]string{"Created", incident.GetCreatedAt()},
+		[]string{"Service", incident.GetService().GetSummary()},
 	}
 
 	table.Rows = data
-	table.FgColor = detailsColor(incident.Status)
+	table.FgColor = detailsColor(incident.GetStatus())
 	table.Analysis()
 	table.SetSize()
 	ui.Body.Align()

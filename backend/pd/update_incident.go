@@ -1,4 +1,4 @@
-package pdapi
+package pd
 
 import (
 	"bytes"
@@ -7,42 +7,43 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"pdcli/config"
-	"pdcli/models"
+	. "pdcli/backend/pd/models"
+	. "pdcli/i"
 )
 
 // UpdateIncident - update the incident on PD service
-func UpdateIncident(ctx *config.AppContext, info models.IncidentUpdateInfo) models.Incident {
+func (Backend) UpdateIncident(ctx *AppContext, info UpdateIncidentInfo) IIncident {
 	apiURL := baseURL + "/incidents/" + info.ID
 
-	client, request := APIRequest(
+	client, request := HTTPRequest(
 		ctx,
 		http.MethodPut,
 		apiURL,
 		bytes.NewReader(jsonBody(info.Status)),
 	)
 
-	request.Header.Set("From", info.From)
+	request.Header.Set("From", info.Config.GetConfig().(Config).Email)
 	request.Header.Set("Content-Type", "application/json")
 
 	res, putErr := client.Do(request)
-	result := struct{ Incident models.Incident }{models.Incident{}}
 
 	if putErr != nil {
 		*ctx.FailuresChannel <- putErr.Error()
-		return result.Incident
+		return PDIncident{}
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
 		*ctx.FailuresChannel <- readErr.Error()
-		return result.Incident
+		return PDIncident{}
 	}
+
+	result := struct{ Incident PDIncident }{}
 
 	jsonErr := json.Unmarshal(body, &result)
 	if jsonErr != nil {
 		*ctx.FailuresChannel <- jsonErr.Error()
-		return result.Incident
+		return PDIncident{}
 	}
 
 	return result.Incident

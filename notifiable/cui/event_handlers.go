@@ -3,8 +3,7 @@ package cui
 import (
 	ui "github.com/pdevine/termui"
 
-	. "pdcli/config"
-	. "pdcli/models"
+	. "pdcli/i"
 )
 
 // Render ...
@@ -12,7 +11,6 @@ import (
 // to make it easy to test different evetns.
 // @see.. tests/cui/event_handlers_test.go
 var Render = ui.Render
-var StopLoop = ui.StopLoop
 
 // HandleEvents handls the kyboard commands.
 //
@@ -23,29 +21,27 @@ var StopLoop = ui.StopLoop
 // C-t --- toggle auto-ack mode
 // C-c --- close app
 func HandleEvents(ctx *AppContext, wdgts Widgets) {
-
-	// send an "acknowledge" message to the PD updating channel
 	ui.Handle("/sys/kbd/C-k", func(ui.Event) {
-		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
+		*ctx.UpdateBackendChannel <- UpdateIncidentInfo{
 			ID:     wdgts.IncidentsWidget.Current().ItemVal,
-			From:   ctx.PDConfig.Email,
 			Status: ACKNOWLEDGED,
+			Config: ctx.Backend,
 		}
 	})
 
 	ui.Handle("/sys/kbd/C-r", func(ui.Event) {
-		*ctx.PDUpdatingChannel <- IncidentUpdateInfo{
+		*ctx.UpdateBackendChannel <- UpdateIncidentInfo{
 			ID:     wdgts.IncidentsWidget.Current().ItemVal,
-			From:   ctx.PDConfig.Email,
 			Status: RESOLVED,
+			Config: ctx.Backend,
 		}
 	})
 
 	ui.Handle("/sys/kbd/C-t", func(ui.Event) {
-		if ctx.Mode == &ModeM {
-			ctx.Mode = &ModeA
+		if ctx.Mode == ModeN {
+			ctx.Mode = ModeA
 		} else {
-			ctx.Mode = &ModeM
+			ctx.Mode = ModeN
 		}
 
 		wdgts.ModeWidget.Label = ctx.Mode.Code
@@ -55,7 +51,7 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 	})
 
 	ui.Handle("/sys/kbd/C-v", func(ui.Event) {
-		*ctx.PDGetIncidentChannel <- wdgts.IncidentsWidget.Current().ItemVal
+		*ctx.GetIncidentChannel <- wdgts.IncidentsWidget.Current().ItemVal
 	})
 
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {
@@ -76,9 +72,8 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
-		*ctx.TermChannel <- true
+		*ctx.TerminateChannel <- true
 		*ctx.StopFrequestingChannel <- true
-		StopLoop()
+		ui.StopLoop()
 	})
-
 }
