@@ -11,12 +11,12 @@ import (
 )
 
 var _ = Describe("Incident Actions", func() {
+	updateBackendChannel := make(chan UpdateIncidentInfo)
+
 	var pdbe IncidentBackend
-	var updateBackendChannel chan UpdateIncidentInfo
 
 	Describe("Ack()", func() {
 		BeforeEach(func() {
-			updateBackendChannel = make(chan UpdateIncidentInfo)
 			pdbe = pd.Backend{
 				pd.Config{
 					Token: "token",
