@@ -28,7 +28,7 @@ var _ = Describe("Incident Actions", func() {
 		It("Sends ACK message to the updateBackendChannel when status is TRIGGERED", func() {
 			incident := PDIncident{ID: "I1", Status: TRIGGERED}
 
-			go Ack(incident, &updateBackendChannel, pdbe)
+			go Ack(incident.GetID(), &updateBackendChannel, pdbe)
 			Eventually(updateBackendChannel).Should(Receive(
 				Equal(UpdateIncidentInfo{
 					ID:     incident.GetID(),
@@ -44,7 +44,7 @@ var _ = Describe("Incident Actions", func() {
 			for _, status := range statuses {
 				incident := PDIncident{ID: "I1", Status: status}
 
-				go Ack(incident, &updateBackendChannel, pdbe)
+				go Ack(incident.GetID(), &updateBackendChannel, pdbe)
 				Eventually(updateBackendChannel).Should(Not(Receive()))
 			}
 		})
@@ -57,7 +57,7 @@ var _ = Describe("Incident Actions", func() {
 			for _, status := range statuses {
 				incident := PDIncident{ID: "I1", Status: status}
 
-				go Resolve(incident, &updateBackendChannel, pdbe)
+				go Resolve(incident.GetID(), &updateBackendChannel, pdbe)
 				Eventually(updateBackendChannel).Should(Receive(
 					Equal(UpdateIncidentInfo{
 						ID:     incident.ID,
@@ -70,7 +70,7 @@ var _ = Describe("Incident Actions", func() {
 
 		It("does not send any messages to the updateBackendChannel when status is RESOLVED", func() {
 			incident := PDIncident{ID: "I1", Status: RESOLVED}
-			go Resolve(incident, &updateBackendChannel, pdbe)
+			go Resolve(incident.GetID(), &updateBackendChannel, pdbe)
 
 			Expect(updateBackendChannel).NotTo(Receive())
 		})

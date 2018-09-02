@@ -30,7 +30,7 @@ func PDWorker(ctx *AppContext) {
 			if ctx.Mode.Code == ModeA.Code {
 				for _, incident := range incidents {
 					Ack(
-						incident,
+						incident.GetID(),
 						ctx.UpdateBackendChannel,
 						ctx.Backend,
 					)

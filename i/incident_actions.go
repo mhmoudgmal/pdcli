@@ -1,34 +1,26 @@
 package i
 
-type configurable interface {
-	GetConfig() interface{}
-}
-
-// UpdateIncidentInfo - represents the message to be send when attempting to update the incident
+// UpdateIncidentInfo is the message to be sent on updating the incident
 type UpdateIncidentInfo struct {
 	ID     string
 	Status string
-	Config configurable
+	Config Configurable
 }
 
-// Ack - sends an ack message to the update incident channel
-func Ack(incident IIncident, updateChan *chan UpdateIncidentInfo, config configurable) {
-	if incident.GetStatus() == TRIGGERED {
-		*updateChan <- UpdateIncidentInfo{
-			ID:     incident.GetID(),
-			Status: ACKNOWLEDGED,
-			Config: config,
-		}
+// Ack sends an ack message to UpdateIncidentInfo channel
+func Ack(id string, updateChan *chan UpdateIncidentInfo, config Configurable) {
+	*updateChan <- UpdateIncidentInfo{
+		ID:     id,
+		Status: ACKNOWLEDGED,
+		Config: config,
 	}
 }
 
-// Resolve - sends a resolve message to the update incident channel
-func Resolve(incident IIncident, updateChan *chan UpdateIncidentInfo, config configurable) {
-	if incident.GetStatus() != RESOLVED {
-		*updateChan <- UpdateIncidentInfo{
-			ID:     incident.GetID(),
-			Status: RESOLVED,
-			Config: config,
-		}
+// Resolve sends a resolve message to UpdateIncidentInfo channel
+func Resolve(id string, updateChan *chan UpdateIncidentInfo, config Configurable) {
+	*updateChan <- UpdateIncidentInfo{
+		ID:     id,
+		Status: RESOLVED,
+		Config: config,
 	}
 }
