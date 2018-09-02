@@ -4,6 +4,8 @@
 
 PagerDuty CLI **(Under development)**
 
+> inspired by vim, so it has normal mode where you interact with incidents via commands (C-k, C-r) while naviagting incidents via (j, k).
+
 ## Development
 - clone the project `git clone git@github.com:mhmoudgmal/PD.cli.git pdcli`
 - install go dep tool `go get -u github.com/golang/dep/cmd/dep`
@@ -13,7 +15,7 @@ PagerDuty CLI **(Under development)**
 This project uses ginkgo BDD framework https://github.com/onsi/ginkgo
 
 - run `go test ./...`
-- or install ginkgo and run `ginkgo -r`
+- or install ginkgo and run `ginkgo -r --randomizeAllSpecs --randomizeSuites  --race --trace` 
 
 ## Run the app
 - `go build`
