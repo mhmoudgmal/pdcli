@@ -43,9 +43,10 @@ func PDWorker(ctx *AppContext) {
 		for {
 			select {
 			case updateIncidentInfo := <-*ctx.UpdateBackendChannel:
-				incident := incidentsBackend.UpdateIncident(ctx, updateIncidentInfo)
-				ctx.Notifiable.Notify("updated-incident", incident)
-				ctx.Notifiable.Notify("detailed-incident", incident)
+				if incident := incidentsBackend.UpdateIncident(ctx, updateIncidentInfo); incident.GetStatus() != "" {
+					ctx.Notifiable.Notify("updated-incident", incident)
+					ctx.Notifiable.Notify("detailed-incident", incident)
+				}
 			}
 		}
 	}()
