@@ -1,7 +1,10 @@
 package cui
 
 import (
-	ui "github.com/pdevine/termui"
+	"os/exec"
+	"runtime"
+
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/i"
 )
@@ -19,6 +22,7 @@ var Render = ui.Render
 // C-k --- acknowledge incident
 // C-r --- resolve incident
 // C-t --- toggle auto-ack mode
+// C-o --- opens incident in the browser
 // C-c --- close app
 func HandleEvents(ctx *AppContext, wdgts Widgets) {
 	ui.Handle("/sys/kbd/C-k", func(ui.Event) {
@@ -68,7 +72,28 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
 		*ctx.TerminateChannel <- true
-		*ctx.StopFrequestingChannel <- true
 		ui.StopLoop()
 	})
+
+	ui.Handle("/sys/kbd/C-o", func(ui.Event) {
+		incidentURL := wdgts.IncidentsWidget.Current().Data["url"]
+		go open(incidentURL)
+	})
+}
+
+func open(url string) error {
+	var cmd string
+	var args []string
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start"}
+	case "darwin":
+		cmd = "open"
+	default: // "linux", "freebsd", "openbsd", "netbsd"
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	return exec.Command(cmd, args...).Start()
 }

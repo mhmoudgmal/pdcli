@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	pd "pdcli/backend/pd"
 	. "pdcli/i"
 )
 
@@ -61,5 +62,26 @@ func PDWorker(ctx *AppContext) {
 		}
 	}()
 
-	<-*ctx.StopFrequestingChannel
+	go func() {
+		var teams []string
+
+		select {
+		case teams = <-*ctx.TeamsChannel:
+		case <-time.After(time.Duration(5 * time.Second)):
+			teams = []string{}
+		}
+
+		services := incidentsBackend.GetServices(ctx, teams)
+		ctx.Notifiable.Notify("list-services", services)
+	}()
+
+	go func() {
+		users := incidentsBackend.GetUsers(ctx)
+		for _, user := range users {
+			if user.GetEmail() == ctx.Backend.GetConfig().(pd.Config).Email {
+				*ctx.TeamsChannel <- user.GetTeams()
+			}
+		}
+
+	}()
 }

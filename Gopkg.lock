@@ -14,6 +14,12 @@
   version = "v0.0.2"
 
 [[projects]]
+  branch = "item-in-memory-data"
+  name = "github.com/mhmoudgmal/termui"
+  packages = ["."]
+  revision = "a8ec64446d6b82eda8ec83cc8486ae86509159ba"
+
+[[projects]]
   branch = "master"
   name = "github.com/mitchellh/go-wordwrap"
   packages = ["."]
@@ -38,10 +44,10 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "listbox"
+  branch = "master"
   name = "github.com/pdevine/termui"
   packages = ["."]
-  revision = "86fcb5665c385cd27e94a0d2d4c82329cb50c840"
+  revision = "72304ddb9b4e9838426a021aad64a5a860e98324"
 
 [[projects]]
   branch = "master"
@@ -76,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2ff99f9fa516d47ee8593425d1fc5e1446ac9842d88daf11d6c8aa4d84bdb4b6"
+  inputs-digest = "f086480dd2c91f7086b5c2f3330d23fda1a4d722fc31959d9b63772c59a414eb"
   solver-name = "gps-cdcl"
   solver-version = 1

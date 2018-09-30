@@ -11,14 +11,15 @@ import (
 )
 
 var (
-	reqInterval            = 2 * time.Second
-	stopFrequesting        = make(chan bool)
+	reqInterval            = 5 * time.Second
 	terminateChannel       = make(chan bool)
 	failuresChannel        = make(chan string)
 	getIncidentChannel     = make(chan string)
 	updateStatusChannel    = make(chan IIncident)
 	incidentDetailsChannel = make(chan IIncident)
 	incidentsChannel       = make(chan IIncidents)
+	servicesChannel        = make(chan IServices)
+	teamsChannel           = make(chan []string)
 	updateIncidentChannel  = make(chan UpdateIncidentInfo)
 )
 
@@ -48,18 +49,22 @@ func main() {
 	incidentNotifiable = notifiableFor(*notifiable, &ctx)
 
 	ctx = AppContext{
-		Backend:                incidentBackend,
-		Notifiable:             incidentNotifiable,
-		FrequestDuration:       reqInterval,
-		Mode:                   ModeN,
-		FailuresChannel:        &failuresChannel,
-		TerminateChannel:       &terminateChannel,
-		IncidentsChannel:       &incidentsChannel,
-		UpdateBackendChannel:   &updateIncidentChannel,
-		UpdateStatusChannel:    &updateStatusChannel,
-		IncidentDetailsChannel: &incidentDetailsChannel,
-		GetIncidentChannel:     &getIncidentChannel,
-		StopFrequestingChannel: &stopFrequesting,
+		Mode:             ModeN,
+		Backend:          incidentBackend,
+		Notifiable:       incidentNotifiable,
+		FrequestDuration: reqInterval,
+		TerminateChannel: &terminateChannel,
+
+		BackendChannels: BackendChannels{
+			TeamsChannel:           &teamsChannel,
+			ServicesChannel:        &servicesChannel,
+			FailuresChannel:        &failuresChannel,
+			IncidentsChannel:       &incidentsChannel,
+			GetIncidentChannel:     &getIncidentChannel,
+			UpdateStatusChannel:    &updateStatusChannel,
+			UpdateBackendChannel:   &updateIncidentChannel,
+			IncidentDetailsChannel: &incidentDetailsChannel,
+		},
 	}
 
 	go incidentNotifiable.Init(&ctx)
@@ -78,8 +83,6 @@ func backendFor(b string, opts map[string]string) IncidentBackend {
 				Email: opts["email"],
 			},
 		}
-	case "victorops":
-		panic("vectorops backend is not supported yet!")
 	default:
 		panic("backend is not supported")
 	}
@@ -91,8 +94,6 @@ func notifiableFor(n string, ctx *AppContext) IncidentNotifiable {
 		return Cui{
 			AppContext: ctx,
 		}
-	case "siren":
-		panic("Siren notifiaction is not supported yet!")
 	default:
 		panic("notifiable is not supported")
 	}

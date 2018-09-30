@@ -1,7 +1,7 @@
 package cui
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/i"
 	. "pdcli/notifiable/cui/helpers"
@@ -26,19 +26,22 @@ func (Cui) Init(ctx *AppContext) {
 		helpWidget(),
 		modeWidget(ctx),
 		incidentsWidget(),
+		servicesWidget(),
 		onCallStatusWidget(),
 		incidentDetailsWidget(),
+		incidentDescriptionWidget(),
 	}
 
-	// build cui
+	// build ui
 	ui.Body.AddRows(
 		ui.NewRow(
 			ui.NewCol(6, 0, widgets.HelpWidget),
 			ui.NewCol(6, 0, widgets.OnCallStatusWidget, widgets.ModeWidget),
 		),
+
 		ui.NewRow(
-			ui.NewCol(6, 0, widgets.IncidentsWidget),
-			ui.NewCol(6, 0, widgets.IncidentDetailsWidget),
+			ui.NewCol(6, 0, widgets.IncidentDetailsWidget, widgets.IncidentDescriptionWidget),
+			ui.NewCol(6, 0, widgets.IncidentsWidget, widgets.ServicesWidget),
 		),
 	)
 
@@ -46,9 +49,14 @@ func (Cui) Init(ctx *AppContext) {
 	ui.Body.Align()
 	ui.Render(ui.Body)
 
+	// Handle events and update widgets
 	go HandleEvents(ctx, widgets)
 	go UpdateIncidentsWidget(ctx, widgets.IncidentsWidget)
-	go UpdateIncidentDetailsWidget(ctx, widgets.IncidentDetailsWidget)
+	go UpdateServicesWidget(ctx, widgets.ServicesWidget)
+	go UpdateIncidentDetailsWidget(ctx,
+		widgets.IncidentDetailsWidget,
+		widgets.IncidentDescriptionWidget,
+	)
 
 	ui.Loop()
 }
@@ -62,10 +70,12 @@ func (c Cui) Notify(msg string, data interface{}) {
 		*c.AppContext.UpdateStatusChannel <- data.(IIncident)
 	case "detailed-incident":
 		*c.AppContext.IncidentDetailsChannel <- data.(IIncident)
+	case "list-services":
+		*c.AppContext.ServicesChannel <- data.(IServices)
 	}
 }
 
-// Clean cleans after you
+// Clean after you
 func (Cui) Clean() {
 	ui.Clear()
 }

@@ -1,17 +1,21 @@
 package models
 
-import . "pdcli/i"
+import (
+	. "pdcli/i"
+	"strings"
+)
 
 // PDIncident minimal representation
 type PDIncident struct {
-	IncidentNumber int    `json:"incident_number"`
-	ID             string `json:"id"`
-	Title          string `json:"title"`
-	Description    string `json:"description"`
-	CreatedAt      string `json:"created_at"`
-	Urgency        string `json:"urgency"`
-	HTMLURL        string `json:"html_url"`
-	Status         string `json:"status"`
+	IncidentNumber int          `json:"incident_number"`
+	ID             string       `json:"id"`
+	Title          string       `json:"title"`
+	Description    string       `json:"description"`
+	CreatedAt      string       `json:"created_at"`
+	Urgency        string       `json:"urgency"`
+	HTMLURL        string       `json:"html_url"`
+	Status         string       `json:"status"`
+	Assignments    []Assignment `json:"assignments"`
 	PDService      `json:"service"`
 }
 
@@ -48,6 +52,15 @@ func (pdi PDIncident) GetUrgency() string {
 // GetURL ..
 func (pdi PDIncident) GetURL() string {
 	return pdi.HTMLURL
+}
+
+// GetAssignedTo ..
+func (pdi PDIncident) GetAssignedTo() string {
+	assingees := []string{}
+	for _, ass := range pdi.Assignments {
+		assingees = append(assingees, ass.AssignedTo())
+	}
+	return strings.Join(assingees, ",")
 }
 
 // GetStatus ..

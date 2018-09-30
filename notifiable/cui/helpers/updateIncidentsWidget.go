@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/i"
 )
@@ -30,6 +30,7 @@ func mapIncidentsToUIItems(incidents IIncidents) []ui.Item {
 			incidentsItems, ui.Item{
 				ItemVal: incident.GetID(),
 				Text:    Inspect(incident),
+				Data:    map[string]string{"url": incident.GetURL()},
 			},
 		)
 	}
@@ -39,8 +40,10 @@ func mapIncidentsToUIItems(incidents IIncidents) []ui.Item {
 
 func updateIncidentListBox(lb *ui.ListBox, incidentsItems []ui.Item) {
 	lb.Items = incidentsItems
-	lb.Height = len(incidentsItems) + 2
+	lb.Height = lb.Height + len(incidentsItems)
+	ui.Body.Align()
 	ui.Render(lb)
+	ui.Render(ui.Body)
 }
 
 func updateIncidentStatus(lb *ui.ListBox, incidentsItems []ui.Item, incident IIncident) {
@@ -52,6 +55,7 @@ func updateIncidentStatus(lb *ui.ListBox, incidentsItems []ui.Item, incident IIn
 			Text:    Inspect(incident),
 		}
 		ui.Render(lb)
+		ui.Render(ui.Body)
 	}
 }
 

@@ -18,7 +18,9 @@ var incidentStatusColorMapper = map[string]string{
 // IService interface of a backend representation to the service entity or concept
 type IService interface {
 	GetID() string
+	GetName() string
 	GetSummary() string
+	GetLastIncident() string
 }
 
 // IIncident interface of a backend representation to the incident entity or concept
@@ -31,13 +33,15 @@ type IIncident interface {
 	GetUrgency() string
 	GetURL() string
 	GetStatus() string
+	GetAssignedTo() string
 	GetService() IService
 }
 
 // IIncidents is the collection of incidents
 type IIncidents []IIncident
+type IServices []IService
 
 // Inspect formats and colorize the incident according to its status
 func Inspect(incident IIncident) string {
-	return "[⬤]" + incidentStatusColorMapper[incident.GetStatus()] + " " + incident.GetID() + " @ " + incident.GetURL()
+	return "[⬤]" + incidentStatusColorMapper[incident.GetStatus()] + " " + incident.GetTitle()
 }

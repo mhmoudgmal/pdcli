@@ -7,8 +7,8 @@
   version = "1.2.0"
 
 [[constraint]]
-  branch = "listbox"
-  name = "github.com/pdevine/termui"
+  branch = "item-in-memory-data"
+  name = "github.com/mhmoudgmal/termui"
 
 [[constraint]]
   name = "gopkg.in/h2non/gock.v1"

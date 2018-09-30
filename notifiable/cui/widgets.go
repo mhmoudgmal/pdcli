@@ -1,7 +1,7 @@
 package cui
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/i"
 )
@@ -18,10 +18,9 @@ C-v   Show the details of the selected incident
 `
 	helpWidget := ui.NewPar(helpWidgetText)
 	helpWidget.Height = 10
-	helpWidget.Width = 50
+	helpWidget.BorderFg = ui.ColorCyan
 	helpWidget.TextFgColor = ui.ColorWhite
 	helpWidget.BorderLabel = "Help center"
-	helpWidget.BorderFg = ui.ColorCyan
 
 	return helpWidget
 }
@@ -39,38 +38,51 @@ func modeWidget(ctx *AppContext) *ui.Gauge {
 func onCallStatusWidget() *ui.Gauge {
 	onCallStatusWidget := ui.NewGauge()
 	onCallStatusWidget.Percent = 100
-	onCallStatusWidget.Label = "Currently off call"
 	onCallStatusWidget.BarColor = ui.ColorDefault
 	onCallStatusWidget.PercentColorHighlighted = ui.ColorDefault
+	onCallStatusWidget.Label = "Currently off call"
 
 	return onCallStatusWidget
 }
-
 func incidentsWidget() *ui.ListBox {
-	incidentItems := []ui.Item{}
 	incidentsListBox := ui.NewListBox()
-	incidentsListBox.Items = incidentItems
-	incidentsListBox.ItemFgColor = ui.ColorYellow
-	incidentsListBox.BorderLabel = "Incidents"
 	incidentsListBox.Height = 2
-	incidentsListBox.Width = 20
-	incidentsListBox.Y = 0
+	incidentsListBox.ItemFgColor = ui.ColorWhite
+	incidentsListBox.BorderLabel = "Incidents"
 
 	return incidentsListBox
 }
 
 func incidentDetailsWidget() *ui.Table {
 	incidentDetails := ui.NewTable()
-	incidentDetails.Border = true
-	incidentDetails.TextAlign = ui.AlignCenter
+	incidentDetails.Border = false
 	return incidentDetails
 }
 
-// Widgets ...
+func incidentDescriptionWidget() *ui.Par {
+	incidentDescriptionWidget := ui.NewPar("")
+	incidentDescriptionWidget.TextFgColor = ui.ColorWhite
+	incidentDescriptionWidget.Border = false
+
+	return incidentDescriptionWidget
+}
+
+func servicesWidget() *ui.ListBox {
+	servicesListBox := ui.NewListBox()
+	servicesListBox.Height = 2
+	servicesListBox.ItemFgColor = ui.ColorYellow
+	servicesListBox.BorderLabel = "Services"
+
+	return servicesListBox
+}
+
+// Widgets ..
 type Widgets struct {
-	HelpWidget            *ui.Par
-	ModeWidget            *ui.Gauge
-	IncidentsWidget       *ui.ListBox
-	OnCallStatusWidget    *ui.Gauge
-	IncidentDetailsWidget *ui.Table
+	HelpWidget                *ui.Par
+	ModeWidget                *ui.Gauge
+	IncidentsWidget           *ui.ListBox
+	ServicesWidget            *ui.ListBox
+	OnCallStatusWidget        *ui.Gauge
+	IncidentDetailsWidget     *ui.Table
+	IncidentDescriptionWidget *ui.Par
 }

@@ -1,5 +1,13 @@
 package i
 
+type IUsers []IUser
+type IUser interface {
+	GetID() string
+	GetName() string
+	GetEmail() string
+	GetTeams() []string
+}
+
 // Configurable ..
 type Configurable interface {
 	GetConfig() interface{}
@@ -9,10 +17,14 @@ type Configurable interface {
 // PagerDuty is an example of incident-management service provider.
 type IncidentBackend interface {
 	Configurable
+	// Get users
+	GetUsers(*AppContext) IUsers
+	// List services.
+	GetServices(*AppContext, []string) IServices
 	// List incidents.
-	GetIncidents(ctx *AppContext, options map[string]string) IIncidents
+	GetIncidents(*AppContext, map[string]string) IIncidents
 	// Get a specific incident details.
-	GetIncident(ctx *AppContext, id string) IIncident
+	GetIncident(*AppContext, string) IIncident
 	// Update an incident info (e.g incident-status).
-	UpdateIncident(ctx *AppContext, info UpdateIncidentInfo) IIncident
+	UpdateIncident(*AppContext, UpdateIncidentInfo) IIncident
 }

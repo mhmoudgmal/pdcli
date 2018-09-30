@@ -1,6 +1,6 @@
 package i
 
-import ui "github.com/pdevine/termui"
+import ui "github.com/mhmoudgmal/termui"
 
 // Mode the application modes.
 type Mode struct {
