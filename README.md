@@ -1,13 +1,13 @@
-[![Build Status](https://travis-ci.org/mhmoudgmal/PD.cli.svg?branch=master)](https://travis-ci.org/mhmoudgmal/PD.cli)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mhmoudgmal/PD.cli)](https://goreportcard.com/report/github.com/mhmoudgmal/PD.cli)
-[![Generic badge](https://img.shields.io/badge/editor-vim-yellowgreen.svg)](https://github.com/mhmoudgmal/PD.cli)
+[![Build Status](https://travis-ci.org/mhmoudgmal/pdcli.svg?branch=master)](https://travis-ci.org/mhmoudgmal/pdcli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mhmoudgmal/pdcli)](https://goreportcard.com/report/github.com/mhmoudgmal/pdcli)
+[![Generic badge](https://img.shields.io/badge/editor-vim-yellowgreen.svg)](https://github.com/mhmoudgmal//pdcli)
 
 PagerDuty CLI **(Under development)**
 
 > inspired by vim, so it has normal mode where you interact with incidents via commands (C-k, C-r) while naviagting incidents via (j, k).
 
 ## Development
-- clone the project `git clone git@github.com:mhmoudgmal/PD.cli.git pdcli`
+- clone the project `git clone git@github.com:mhmoudgmal/pdcli`
 - install go dep tool `go get -u github.com/golang/dep/cmd/dep`
 - run `dep ensure`
 
