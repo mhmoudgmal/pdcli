@@ -1,9 +1,11 @@
 language: go
 sudo: false
 go:
-  - 1.8.x
   - 1.9.x
   - 1.10.x
+  - 1.11.x
+  - 1.12.x
+  - 1.13.x
 
 install:
   - go get github.com/onsi/ginkgo/ginkgo
@@ -13,7 +15,7 @@ install:
   - dep ensure
 
 before_script:
-  - cd $GOPATH/src; mv ./github.com/mhmoudgmal/PD.cli ./pdcli
+  - cd $GOPATH/src; mv ./github.com/mhmoudgmal/pdcli ./pdcli
   - cd ./pdcli
 
 script:

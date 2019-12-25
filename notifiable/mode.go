@@ -1,4 +1,4 @@
-package i
+package notifiable
 
 import ui "github.com/pdevine/termui"
 

@@ -1,10 +1,7 @@
 package cui
 
-import (
-	ui "github.com/pdevine/termui"
-
-	. "pdcli/i"
-)
+import ui "github.com/pdevine/termui"
+import . "pdcli/notifiable"
 
 func helpWidget() *ui.Par {
 	helpWidgetText := `
@@ -14,7 +11,7 @@ C-k   Acknowledge selected incident
 C-r   Resolve selected incident
 C-v   Show the details of the selected incident
 
-[⬤](fg-green)  Resolved [⬤](fg-yellow)  Acknowledged [⬤](fg-red)  Triggered
+ [⬤](fg-green)  Resolved [⬤](fg-yellow)  Acknowledged [⬤](fg-red)  Triggered
 `
 	helpWidget := ui.NewPar(helpWidgetText)
 	helpWidget.Height = 10
@@ -26,11 +23,11 @@ C-v   Show the details of the selected incident
 	return helpWidget
 }
 
-func modeWidget(ctx *AppContext) *ui.Gauge {
+func modeWidget(mode *Mode) *ui.Gauge {
 	modeWidget := ui.NewGauge()
 	modeWidget.Percent = 100
-	modeWidget.Label = ctx.Mode.Code
-	modeWidget.BarColor = ctx.Mode.Color
+	modeWidget.Label = mode.Code
+	modeWidget.BarColor = mode.Color
 	modeWidget.PercentColorHighlighted = ui.ColorDefault
 
 	return modeWidget

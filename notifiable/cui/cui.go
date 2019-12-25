@@ -3,18 +3,31 @@ package cui
 import (
 	ui "github.com/pdevine/termui"
 
-	. "pdcli/i"
+	. "pdcli/backend/pd"
+	. "pdcli/notifiable"
 	. "pdcli/notifiable/cui/helpers"
 )
 
-// Cui the command line interface notifiable or client.
+// Cui the command line interface notifiable client.
 type Cui struct {
-	*AppContext
 	Widgets
 }
 
-// Init Initializes the app CUI
-func (Cui) Init(ctx *AppContext) {
+// Init initializes command line interface client
+func (Cui) Init(
+	mode *Mode,
+	terminateChan *chan bool,
+	stopWorkerChan *chan bool,
+	inspectIncidentChan *chan string,
+
+	incidentChan *chan Incident,
+	incidentsChan *chan []Incident,
+
+	updateIncidentStatusChan *chan struct {
+		ID     string
+		Status string
+	},
+) {
 	defer ui.Close()
 
 	if err := ui.Init(); err != nil {
@@ -24,7 +37,7 @@ func (Cui) Init(ctx *AppContext) {
 	// create widgets
 	widgets := Widgets{
 		helpWidget(),
-		modeWidget(ctx),
+		modeWidget(mode),
 		incidentsWidget(),
 		onCallStatusWidget(),
 		incidentDetailsWidget(),
@@ -46,26 +59,19 @@ func (Cui) Init(ctx *AppContext) {
 	ui.Body.Align()
 	ui.Render(ui.Body)
 
-	go HandleEvents(ctx, widgets)
-	go UpdateIncidentsWidget(ctx, widgets.IncidentsWidget)
-	go UpdateIncidentDetailsWidget(ctx, widgets.IncidentDetailsWidget)
+	go HandleEvents(widgets, terminateChan, stopWorkerChan, inspectIncidentChan, updateIncidentStatusChan)
+	go UpdateIncidentsWidget(widgets.IncidentsWidget, incidentsChan)
+	go InspectIncidentWidget(incidentChan, widgets.IncidentDetailsWidget)
 
 	ui.Loop()
 }
 
-// Notify Cui
-func (c Cui) Notify(msg string, data interface{}) {
-	switch msg {
-	case "new-incidents":
-		*c.AppContext.IncidentsChannel <- data.(IIncidents)
-	case "updated-incident":
-		*c.AppContext.UpdateStatusChannel <- data.(IIncident)
-	case "detailed-incident":
-		*c.AppContext.IncidentDetailsChannel <- data.(IIncident)
-	}
+// Notify notifies Cui
+func (c Cui) Notify(cb func(...Incident), data ...Incident) {
+	cb(data...)
 }
 
-// Clean cleans after you
+// Clean cleans Cui
 func (Cui) Clean() {
 	ui.Clear()
 }

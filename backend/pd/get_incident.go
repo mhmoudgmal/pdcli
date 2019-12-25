@@ -4,35 +4,29 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-
-	. "pdcli/backend/pd/models"
-	. "pdcli/i"
 )
 
 // GetIncident - requests incident information from PD service
-func (Backend) GetIncident(ctx *AppContext, id string) IIncident {
+func (backend Backend) GetIncident(id string) (Incident, error) {
 	resourceURL := baseURL + "/incidents/" + id
 
-	client, request := HTTPRequest(ctx, http.MethodGet, resourceURL, nil)
+	client, request := HTTPRequest(backend, http.MethodGet, resourceURL, nil)
 
 	res, getErr := client.Do(request)
 	if getErr != nil {
-		*ctx.FailuresChannel <- getErr.Error()
-		return PDIncident{}
+		return Incident{}, getErr
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		*ctx.FailuresChannel <- readErr.Error()
-		return PDIncident{}
+		return Incident{}, readErr
 	}
 
-	result := struct{ Incident PDIncident }{}
+	result := struct{ Incident Incident }{}
 
 	if jsonErr := json.Unmarshal(body, &result); jsonErr != nil {
-		*ctx.FailuresChannel <- jsonErr.Error()
-		return PDIncident{}
+		return Incident{}, jsonErr
 	}
 
-	return result.Incident
+	return result.Incident, nil
 }

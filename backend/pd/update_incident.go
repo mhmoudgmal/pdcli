@@ -6,47 +6,46 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	. "pdcli/backend/pd/models"
-	. "pdcli/i"
 )
 
 // UpdateIncident - update the incident on PD service
-func (Backend) UpdateIncident(ctx *AppContext, info UpdateIncidentInfo) IIncident {
+func (backend Backend) UpdateIncident(info struct {
+	ID     string
+	Status string
+}) (Incident, error) {
 	apiURL := baseURL + "/incidents/" + info.ID
 
 	client, request := HTTPRequest(
-		ctx,
+		backend,
 		http.MethodPut,
 		apiURL,
 		bytes.NewReader(jsonBody(info.Status)),
 	)
 
-	request.Header.Set("From", info.Config.GetConfig().(Config).Email)
+	from := backend.Email
+
+	request.Header.Set("From", from)
 	request.Header.Set("Content-Type", "application/json")
 
 	res, putErr := client.Do(request)
 
 	if putErr != nil {
-		*ctx.FailuresChannel <- putErr.Error()
-		return PDIncident{}
+		return Incident{}, putErr
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		*ctx.FailuresChannel <- readErr.Error()
-		return PDIncident{}
+		return Incident{}, readErr
 	}
 
-	result := struct{ Incident PDIncident }{}
+	result := struct{ Incident Incident }{}
 
 	jsonErr := json.Unmarshal(body, &result)
 	if jsonErr != nil {
-		*ctx.FailuresChannel <- jsonErr.Error()
-		return PDIncident{}
+		return Incident{}, jsonErr
 	}
 
-	return result.Incident
+	return result.Incident, nil
 }
 
 func jsonBody(status string) []byte {
