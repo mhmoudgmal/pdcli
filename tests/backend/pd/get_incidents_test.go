@@ -8,31 +8,19 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "pdcli/backend/pd"
-	. "pdcli/backend/pd/models"
-	. "pdcli/i"
 )
 
 var _ = Describe("PD Backend API", func() {
 	Describe("GetIncidents", func() {
-		var failuresChannel chan string
-		var ctx AppContext
-
-		BeforeEach(func() {
-			failuresChannel = make(chan string)
-
-			ctx = AppContext{
-				FailuresChannel: &failuresChannel,
-				Backend: Backend{
-					Config{
-						Token: "pd_token",
-						Email: "foo@bar.baz",
-					},
-				},
-			}
-		})
+		backend := Backend{
+			Config{
+				Token: "pd_token",
+				Email: "foo@bar.baz",
+			},
+		}
 
 		Context("when request succeeds", func() {
-			incidentsString := `{
+			response := `{
 				"incidents":
 					[
 						{
@@ -55,38 +43,33 @@ var _ = Describe("PD Backend API", func() {
 					HeaderPresent("Accept").
 					Get("/").
 					Reply(200).
-					BodyString(incidentsString)
+					BodyString(response)
 			})
 
 			It("returns the incidents", func() {
-				result := struct{ Incidents []PDIncident }{}
+				result := struct{ Incidents []Incident }{}
 
-				incidents := ctx.Backend.GetIncidents(&ctx, map[string]string{})
-				json.Unmarshal([]byte(incidentsString), &result)
+				incidents, err := backend.GetIncidents(map[string]string{})
+				json.Unmarshal([]byte(response), &result)
 
-				Expect(incidents[0].(PDIncident)).To(Equal(result.Incidents[0]))
-				Expect(gock.IsDone()).To(Equal(true))
-			})
+				Expect(err).To(BeNil())
+				Expect(incidents).To(Equal(result.Incidents))
 
-			It("does not send any messages to the failure chan", func() {
-				ctx.Backend.GetIncidents(&ctx, map[string]string{})
-
-				Expect(*ctx.FailuresChannel).NotTo(Receive())
 				Expect(gock.IsDone()).To(Equal(true))
 			})
 		})
 
-		Context("when bad request", func() {
-			It("sends error message through the failures channel", func() {
-				gock.New("https://api.pagerduty.com/incidents").
-					Get("/").
-					Reply(400)
+		It("returns error when bad request", func() {
+			gock.New("https://api.pagerduty.com/incidents").
+				Get("/").
+				Reply(400)
 
-				go ctx.Backend.GetIncidents(&ctx, map[string]string{})
+			incidents, err := backend.GetIncidents(map[string]string{})
 
-				Eventually(*ctx.FailuresChannel).Should(Receive(Equal("unexpected end of JSON input")))
-				Expect(gock.IsDone()).To(Equal(true))
-			})
+			Expect(incidents).To(Equal([]Incident{}))
+			Expect(err.Error()).To(Equal("unexpected end of JSON input"))
+
+			Expect(gock.IsDone()).To(Equal(true))
 		})
 	})
 })

@@ -1,41 +1,24 @@
 package pd_test
 
 import (
-	"encoding/json"
 	"fmt"
-	"gopkg.in/h2non/gock.v1"
+	. "pdcli/backend/pd"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	. "pdcli/backend/pd"
-	. "pdcli/backend/pd/models"
-	. "pdcli/i"
+	"gopkg.in/h2non/gock.v1"
 )
 
 var _ = Describe("PD Backend API", func() {
 	Describe("UpdateIncident", func() {
-		var failuresChannel chan string
-		var ctx AppContext
-		var incident struct{ Incident PDIncident }
-		var incidentString string
+		backend := Backend{
+			Config{
+				Email: "foo@bar.baz",
+				Token: "pd_token",
+			},
+		}
 
-		BeforeEach(func() {
-			failuresChannel = make(chan string)
-
-			ctx = AppContext{
-				FailuresChannel: &failuresChannel,
-				Backend: Backend{
-					Config{
-						Email: "foo@bar.baz",
-						Token: "pd_token",
-					},
-				},
-			}
-
-			incident = struct{ Incident PDIncident }{}
-
-			incidentString = `{
+		response := `{
 				"incident": {
 							"id": "PT4KHLK",
 							"type": "incident",
@@ -49,59 +32,54 @@ var _ = Describe("PD Backend API", func() {
 						}
 					}`
 
-			json.Unmarshal([]byte(fmt.Sprintf(incidentString, TRIGGERED)), &incident)
-		})
-
 		Context("when request succeeds", func() {
-			var resultIncident IIncident
-
 			JustBeforeEach(func() {
-				gock.New("https://api.pagerduty.com/incidents/"+incident.Incident.GetID()).
+				gock.New("https://api.pagerduty.com/incidents").
 					HeaderPresent("Authorization").
 					MatchHeader("Content-Type", "application/json").
 					MatchHeader("Accept", `application/vnd.pagerduty\+json;version=2`).
-					Put("/").
+					Put("/PT4KHLK").
 					Reply(200).
-					BodyString(fmt.Sprintf(incidentString, ACKNOWLEDGED))
-
-				resultIncident = ctx.Backend.UpdateIncident(
-					&ctx,
-					UpdateIncidentInfo{
-						ID:     incident.Incident.GetID(),
-						Status: ACKNOWLEDGED,
-						Config: ctx.Backend,
-					},
-				)
+					BodyString(fmt.Sprintf(response, ACKNOWLEDGED))
 			})
 
 			It("returns the updated incident", func() {
-				Expect(resultIncident.GetStatus()).To(Equal(ACKNOWLEDGED))
-				Expect(gock.IsDone()).To(Equal(true))
-			})
+				incident, err := backend.UpdateIncident(
+					struct {
+						ID     string
+						Status string
+					}{
+						ID:     "PT4KHLK",
+						Status: ACKNOWLEDGED,
+					},
+				)
 
-			It("does not send any messages to the failure chan", func() {
-				Expect(*ctx.FailuresChannel).NotTo(Receive())
+				Expect(err).To(BeNil())
+				Expect(incident.Status).To(Equal(ACKNOWLEDGED))
+
 				Expect(gock.IsDone()).To(Equal(true))
 			})
 		})
 
-		Context("when bad request", func() {
-			It("sends error message through the failures channel", func() {
-				gock.New("https://api.pagerduty.com/incidents/" + incident.Incident.GetID()).
-					Put("/").
-					Reply(400)
+		It("returns error when bad request", func() {
+			gock.New("https://api.pagerduty.com/incidents").
+				Put("/PT4KHLK").
+				Reply(400)
 
-				go ctx.Backend.UpdateIncident(
-					&ctx, UpdateIncidentInfo{
-						ID:     incident.Incident.GetID(),
-						Status: ACKNOWLEDGED,
-						Config: ctx.Backend,
-					},
-				)
+			incident, err := backend.UpdateIncident(
+				struct {
+					ID     string
+					Status string
+				}{
+					ID:     "PT4KHLK",
+					Status: ACKNOWLEDGED,
+				},
+			)
 
-				Eventually(*ctx.FailuresChannel).Should(Receive(Equal("unexpected end of JSON input")))
-				Expect(gock.IsDone()).To(Equal(true))
-			})
+			Expect(incident).To(Equal(Incident{}))
+			Expect(err.Error()).To(Equal("unexpected end of JSON input"))
+
+			Expect(gock.IsDone()).To(Equal(true))
 		})
 	})
 })

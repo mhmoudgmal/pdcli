@@ -6,48 +6,38 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	. "pdcli/backend/pd/models"
-	. "pdcli/i"
 )
 
 // GetIncidents requests the incidents from PD service
-func (Backend) GetIncidents(ctx *AppContext, options map[string]string) IIncidents {
+func (backend Backend) GetIncidents(params map[string]string) ([]Incident, error) {
 	resourceURL := baseURL + "/incidents"
 
-	client, request := HTTPRequest(ctx, http.MethodGet, buildURL(resourceURL, options), nil)
+	client, request := HTTPRequest(backend, http.MethodGet, buildURL(resourceURL, params), nil)
 
 	res, getErr := client.Do(request)
 	if getErr != nil {
-		*ctx.FailuresChannel <- getErr.Error()
-		return IIncidents{}
+		return []Incident{}, getErr
 	}
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		*ctx.FailuresChannel <- readErr.Error()
-		return IIncidents{}
+		return []Incident{}, readErr
 	}
 
-	result := struct{ Incidents []PDIncident }{}
+	result := struct{ Incidents []Incident }{}
 
 	if jsonErr := json.Unmarshal(body, &result); jsonErr != nil {
-		*ctx.FailuresChannel <- jsonErr.Error()
-		return IIncidents{}
+		return []Incident{}, jsonErr
 	}
 
-	var pdIncidents IIncidents
-	for _, pdIncident := range result.Incidents {
-		pdIncidents = append(pdIncidents, pdIncident)
-	}
-	return pdIncidents
+	return result.Incidents, nil
 }
 
-func buildURL(resourceURL string, options map[string]string) string {
-	params := url.Values{}
-	for pName, pValue := range options {
-		params.Add(pName, pValue)
+func buildURL(resourceURL string, params map[string]string) string {
+	urlParams := url.Values{}
+	for pName, pValue := range params {
+		urlParams.Add(pName, pValue)
 	}
 
-	return fmt.Sprintf("%s?%s", resourceURL, params.Encode())
+	return fmt.Sprintf("%s?%s", resourceURL, urlParams.Encode())
 }

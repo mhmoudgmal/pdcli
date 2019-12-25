@@ -6,9 +6,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "pdcli/i"
+	. "pdcli/backend/pd"
 
-	"pdcli/backend/pd"
 	"pdcli/notifiable/cui"
 )
 
@@ -41,21 +40,35 @@ func resetUI() {
 	cui.Render = ui.Render
 }
 
-func testCommand(ctx *AppContext, commandOpts map[string]interface{}, expect func()) {
-	Describe(commandOpts["cmd"].(string), func() {
-		It(commandOpts["msg"].(string), func() {
+var terminateChan chan bool
+var stopWorkerChan chan bool
+var inspectIncidentChan chan string
+var updateIncidentStatusChan chan struct {
+	ID     string
+	Status string
+}
+
+func testCommand(cmdOpts map[string]interface{}, expect func()) {
+	Describe(cmdOpts["cmd"].(string), func() {
+		It(cmdOpts["msg"].(string), func() {
 			wdgts.IncidentsWidget.Selected = 0
 
-			cui.HandleEvents(ctx, wdgts)
+			cui.HandleEvents(
+				wdgts,
+				&terminateChan,
+				&stopWorkerChan,
+				&inspectIncidentChan,
+				&updateIncidentStatusChan,
+			)
 
 			evtHandlers := ui.DefaultEvtStream.Handlers
-			handler := evtHandlers[commandOpts["path"].(string)]
+			handler := evtHandlers[cmdOpts["path"].(string)]
 
-			if commandOpts["before"] != nil {
-				commandOpts["before"].(func())()
+			if cmdOpts["before"] != nil {
+				cmdOpts["before"].(func())()
 			}
 
-			if commandOpts["exec"].(string) == "async" {
+			if cmdOpts["exec"].(string) == "async" {
 				go handler(ui.Event{})
 			} else {
 				handler(ui.Event{})
@@ -67,25 +80,13 @@ func testCommand(ctx *AppContext, commandOpts map[string]interface{}, expect fun
 }
 
 var _ = Describe("Events", func() {
-	termChan := make(chan bool)
-	pdGetIChan := make(chan string)
-	stopFreqChan := make(chan bool)
-	updatingChan := make(chan UpdateIncidentInfo)
-
-	pdbe := pd.Backend{
-		pd.Config{
-			Token: "token",
-			Email: "foo@bar.baz",
-		},
-	}
-
-	ctx := AppContext{
-		Backend:                &pdbe,
-		UpdateBackendChannel:   &updatingChan,
-		TerminateChannel:       &termChan,
-		StopFrequestingChannel: &stopFreqChan,
-		GetIncidentChannel:     &pdGetIChan,
-	}
+	terminateChan = make(chan bool)
+	stopWorkerChan = make(chan bool)
+	inspectIncidentChan = make(chan string)
+	updateIncidentStatusChan = make(chan struct {
+		ID     string
+		Status string
+	})
 
 	BeforeSuite(func() {
 		mockUI()
@@ -95,46 +96,50 @@ var _ = Describe("Events", func() {
 		resetUI()
 	})
 
-	type commandOpts map[string]interface{}
+	type cmdOpts map[string]interface{}
 
-	testCommand(&ctx, commandOpts{
+	testCommand(cmdOpts{
 		"cmd":  "C-k",
 		"path": "/sys/kbd/C-k",
 		"exec": "async",
-		"msg":  "sends ACKNOWLEDGED message to UpdateBackendChannel",
+		"msg":  "sends ACKNOWLEDGED message to UpdateIncidentStatusChan",
 	}, func() {
-		Eventually(*ctx.UpdateBackendChannel).
-			Should(Receive(Equal(UpdateIncidentInfo{
+		Eventually(updateIncidentStatusChan).
+			Should(Receive(Equal(struct {
+				ID     string
+				Status string
+			}{
 				ID:     "Item1",
 				Status: ACKNOWLEDGED,
-				Config: ctx.Backend,
 			})))
 	})
 
-	testCommand(&ctx, commandOpts{
+	testCommand(cmdOpts{
 		"cmd":  "C-r",
 		"path": "/sys/kbd/C-r",
 		"exec": "async",
-		"msg":  "sends RESOLVED message to UpdateBackendChannel",
+		"msg":  "sends RESOLVED message to UpdateIncidentStatusChan",
 	}, func() {
-		Eventually(*ctx.UpdateBackendChannel).
-			Should(Receive(Equal(UpdateIncidentInfo{
+		Eventually(updateIncidentStatusChan).
+			Should(Receive(Equal(struct {
+				ID     string
+				Status string
+			}{
 				ID:     "Item1",
 				Status: RESOLVED,
-				Config: ctx.Backend,
 			})))
 	})
 
-	testCommand(&ctx, commandOpts{
+	testCommand(cmdOpts{
 		"cmd":  "C-v",
 		"path": "/sys/kbd/C-v",
 		"exec": "async",
-		"msg":  "sends message to GetIncidentChannel",
+		"msg":  "sends message to InspectIncidentChan",
 	}, func() {
-		Eventually(*ctx.GetIncidentChannel).Should(Receive(Equal("Item1")))
+		Eventually(inspectIncidentChan).Should(Receive(Equal("Item1")))
 	})
 
-	testCommand(&ctx, commandOpts{
+	testCommand(cmdOpts{
 		"cmd":    "k",
 		"path":   "/sys/kbd/k",
 		"msg":    "navigate up and select the previous incident item",
@@ -144,7 +149,7 @@ var _ = Describe("Events", func() {
 		Expect(wdgts.IncidentsWidget.Selected).Should(Equal(1))
 	})
 
-	testCommand(&ctx, commandOpts{
+	testCommand(cmdOpts{
 		"cmd":    "j",
 		"path":   "/sys/kbd/j",
 		"msg":    "navigate down and select the next incident item",
@@ -154,13 +159,13 @@ var _ = Describe("Events", func() {
 		Expect(wdgts.IncidentsWidget.Selected).Should(Equal(2))
 	})
 
-	testCommand(&ctx, commandOpts{
+	testCommand(cmdOpts{
 		"cmd":  "C-c",
 		"path": "/sys/kbd/C-c",
-		"msg":  "sends TERM & STOPFREQUESTING messages",
+		"msg":  "sends TERM & stopWorkerChan messages",
 		"exec": "async",
 	}, func() {
-		Eventually(*ctx.TerminateChannel).Should(Receive(Equal(true)))
-		Eventually(*ctx.StopFrequestingChannel).Should(Receive(Equal(true)))
+		Eventually(terminateChan).Should(Receive(Equal(true)))
+		Eventually(stopWorkerChan).Should(Receive(Equal(true)))
 	})
 })

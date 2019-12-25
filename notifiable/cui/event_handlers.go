@@ -1,9 +1,9 @@
 package cui
 
 import (
-	ui "github.com/pdevine/termui"
+	. "pdcli/backend/pd"
 
-	. "pdcli/i"
+	ui "github.com/pdevine/termui"
 )
 
 // Render ...
@@ -13,40 +13,54 @@ import (
 var Render = ui.Render
 
 // HandleEvents handls the kyboard commands.
-//
-// j   --- navigate down
-// k   --- navigate up
-// C-k --- acknowledge incident
-// C-r --- resolve incident
-// C-t --- toggle auto-ack mode
-// C-c --- close app
-func HandleEvents(ctx *AppContext, wdgts Widgets) {
+func HandleEvents(
+	wdgts Widgets,
+	terminateChan *chan bool,
+	stopWorkerChan *chan bool,
+	inspectIncidentChan *chan string,
+	updateIncidentStatusChan *chan struct {
+		ID     string
+		Status string
+	},
+) {
 	ui.Handle("/sys/kbd/C-k", func(ui.Event) {
 		incidentID := wdgts.IncidentsWidget.Current().ItemVal
-		Ack(incidentID, ctx.UpdateBackendChannel, ctx.Backend)
+		*updateIncidentStatusChan <- struct {
+			ID     string
+			Status string
+		}{
+			ID:     incidentID,
+			Status: ACKNOWLEDGED,
+		}
 	})
 
 	ui.Handle("/sys/kbd/C-r", func(ui.Event) {
 		incidentID := wdgts.IncidentsWidget.Current().ItemVal
-		Resolve(incidentID, ctx.UpdateBackendChannel, ctx.Backend)
-	})
-
-	ui.Handle("/sys/kbd/C-t", func(ui.Event) {
-		if ctx.Mode == ModeN {
-			ctx.Mode = ModeA
-		} else {
-			ctx.Mode = ModeN
+		*updateIncidentStatusChan <- struct {
+			ID     string
+			Status string
+		}{
+			ID:     incidentID,
+			Status: RESOLVED,
 		}
-
-		wdgts.ModeWidget.Label = ctx.Mode.Code
-		wdgts.ModeWidget.BarColor = ctx.Mode.Color
-
-		Render(ui.Body)
 	})
+
+	// ui.Handle("/sys/kbd/C-t", func(ui.Event) {
+	// 	if ctx.Mode == ModeN {
+	// 		ctx.Mode = ModeA
+	// 	} else {
+	// 		ctx.Mode = ModeN
+	// 	}
+
+	// 	wdgts.ModeWidget.Label = ctx.Mode.Code
+	// 	wdgts.ModeWidget.BarColor = ctx.Mode.Color
+
+	// 	Render(ui.Body)
+	// })
 
 	ui.Handle("/sys/kbd/C-v", func(ui.Event) {
 		incidentID := wdgts.IncidentsWidget.Current().ItemVal
-		*ctx.GetIncidentChannel <- incidentID
+		*inspectIncidentChan <- incidentID
 	})
 
 	ui.Handle("/sys/wnd/resize", func(e ui.Event) {
@@ -67,8 +81,8 @@ func HandleEvents(ctx *AppContext, wdgts Widgets) {
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
-		*ctx.TerminateChannel <- true
-		*ctx.StopFrequestingChannel <- true
+		*terminateChan <- true
+		*stopWorkerChan <- true
 		ui.StopLoop()
 	})
 }
