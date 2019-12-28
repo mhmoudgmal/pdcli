@@ -10,8 +10,8 @@ import . "pdcli/backend/pd"
 type Notifiable interface {
 	Init(
 		appMode *Mode,
-		terminateChan *chan bool,
-		stopWorkerChan *chan bool,
+		terminateChan *chan struct{},
+		stopWorkerChan *chan struct{},
 		inspectIncidentChan *chan string,
 
 		incidentChan *chan Incident,

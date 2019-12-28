@@ -15,8 +15,8 @@ var Render = ui.Render
 // HandleEvents handls the kyboard commands.
 func HandleEvents(
 	wdgts Widgets,
-	terminateChan *chan bool,
-	stopWorkerChan *chan bool,
+	terminateChan *chan struct{},
+	stopWorkerChan *chan struct{},
 	inspectIncidentChan *chan string,
 	updateIncidentStatusChan *chan struct {
 		ID     string
@@ -81,8 +81,8 @@ func HandleEvents(
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
-		*terminateChan <- true
-		*stopWorkerChan <- true
+		close(*terminateChan)
+		close(*stopWorkerChan)
 		ui.StopLoop()
 	})
 }

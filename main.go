@@ -11,8 +11,8 @@ import (
 
 var (
 	reqInterval         = 2 * time.Second
-	stopWorkerChan      = make(chan bool)
-	terminateChan       = make(chan bool)
+	stopWorkerChan      = make(chan struct{})
+	terminateChan       = make(chan struct{})
 	failuresChan        = make(chan string)
 	inspectIncidentChan = make(chan string)
 	incidentDetailsChan = make(chan Incident)

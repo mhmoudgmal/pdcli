@@ -16,8 +16,8 @@ type Cui struct {
 // Init initializes command line interface client
 func (Cui) Init(
 	mode *Mode,
-	terminateChan *chan bool,
-	stopWorkerChan *chan bool,
+	terminateChan *chan struct{},
+	stopWorkerChan *chan struct{},
 	inspectIncidentChan *chan string,
 
 	incidentChan *chan Incident,

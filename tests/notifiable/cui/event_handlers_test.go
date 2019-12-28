@@ -40,8 +40,8 @@ func resetUI() {
 	cui.Render = ui.Render
 }
 
-var terminateChan chan bool
-var stopWorkerChan chan bool
+var terminateChan chan struct{}
+var stopWorkerChan chan struct{}
 var inspectIncidentChan chan string
 var updateIncidentStatusChan chan struct {
 	ID     string
@@ -80,8 +80,8 @@ func testCommand(cmdOpts map[string]interface{}, expect func()) {
 }
 
 var _ = Describe("Events", func() {
-	terminateChan = make(chan bool)
-	stopWorkerChan = make(chan bool)
+	terminateChan = make(chan struct{})
+	stopWorkerChan = make(chan struct{})
 	inspectIncidentChan = make(chan string)
 	updateIncidentStatusChan = make(chan struct {
 		ID     string
@@ -165,7 +165,7 @@ var _ = Describe("Events", func() {
 		"msg":  "sends TERM & stopWorkerChan messages",
 		"exec": "async",
 	}, func() {
-		Eventually(terminateChan).Should(Receive(Equal(true)))
-		Eventually(stopWorkerChan).Should(Receive(Equal(true)))
+		Eventually(terminateChan).Should(BeClosed())
+		Eventually(stopWorkerChan).Should(BeClosed())
 	})
 })

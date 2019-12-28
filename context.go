@@ -15,9 +15,9 @@ type AppContext struct {
 
 	RequestInterval time.Duration // Frequent requests interval (e.g 2 seconds)
 
-	FailuresChan   *chan string // Receives failure messages
-	TerminateChan  *chan bool   // Receives signal to terminate application
-	StopWorkerChan *chan bool   // Receives signal to stop requesting new incidents
+	FailuresChan   *chan string   // Receives failure messages
+	TerminateChan  *chan struct{} // Receives signal to terminate application
+	StopWorkerChan *chan struct{} // Receives signal to stop requesting new incidents
 
 	IncidentsChan       *chan []Incident // Pass the received incidents between app components
 	IncidentDetailsChan *chan Incident   // Pass incident details between app components
