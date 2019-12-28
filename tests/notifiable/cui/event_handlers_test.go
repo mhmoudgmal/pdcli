@@ -1,7 +1,7 @@
 package cui_test
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

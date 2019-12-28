@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/backend/pd"
 )
@@ -24,6 +24,7 @@ func mapIncidentsToUIItems(incidentItemMap map[string]ui.Item, incidents ...Inci
 		incidentItemMap[incident.ID] = ui.Item{
 			ItemVal: incident.ID,
 			Text:    incident.Inspect("status-line").(string),
+			Data:    map[string]string{"url": incident.URL},
 		}
 	}
 

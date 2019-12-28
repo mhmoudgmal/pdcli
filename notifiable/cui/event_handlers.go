@@ -2,8 +2,9 @@ package cui
 
 import (
 	. "pdcli/backend/pd"
+	. "pdcli/notifiable/cui/helpers"
 
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 )
 
 // Render ...
@@ -78,6 +79,11 @@ func HandleEvents(
 	ui.Handle("/sys/kbd/j", func(ui.Event) {
 		wdgts.IncidentsWidget.Down()
 		Render(wdgts.IncidentsWidget)
+	})
+
+	ui.Handle("/sys/kbd/C-o", func(ui.Event) {
+		incidentURL := wdgts.IncidentsWidget.Current().Data["url"]
+		go OpenIncidentURL(incidentURL)
 	})
 
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {

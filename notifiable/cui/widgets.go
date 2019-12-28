@@ -1,7 +1,10 @@
 package cui
 
-import ui "github.com/pdevine/termui"
-import . "pdcli/notifiable"
+import (
+	. "pdcli/notifiable"
+
+	ui "github.com/mhmoudgmal/termui"
+)
 
 func helpWidget() *ui.Par {
 	helpWidgetText := `

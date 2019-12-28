@@ -1,7 +1,7 @@
 package cui
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/backend/pd"
 	. "pdcli/notifiable"
