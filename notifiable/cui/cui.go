@@ -1,7 +1,7 @@
 package cui
 
 import (
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 
 	. "pdcli/backend/pd"
 	. "pdcli/notifiable"
@@ -16,8 +16,8 @@ type Cui struct {
 // Init initializes command line interface client
 func (Cui) Init(
 	mode *Mode,
-	terminateChan *chan bool,
-	stopWorkerChan *chan bool,
+	terminateChan *chan struct{},
+	stopWorkerChan *chan struct{},
 	inspectIncidentChan *chan string,
 
 	incidentChan *chan Incident,

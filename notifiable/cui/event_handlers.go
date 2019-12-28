@@ -2,8 +2,9 @@ package cui
 
 import (
 	. "pdcli/backend/pd"
+	. "pdcli/notifiable/cui/helpers"
 
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 )
 
 // Render ...
@@ -15,8 +16,8 @@ var Render = ui.Render
 // HandleEvents handls the kyboard commands.
 func HandleEvents(
 	wdgts Widgets,
-	terminateChan *chan bool,
-	stopWorkerChan *chan bool,
+	terminateChan *chan struct{},
+	stopWorkerChan *chan struct{},
 	inspectIncidentChan *chan string,
 	updateIncidentStatusChan *chan struct {
 		ID     string
@@ -80,9 +81,14 @@ func HandleEvents(
 		Render(wdgts.IncidentsWidget)
 	})
 
+	ui.Handle("/sys/kbd/C-o", func(ui.Event) {
+		incidentURL := wdgts.IncidentsWidget.Current().Data["url"]
+		go OpenIncidentURL(incidentURL)
+	})
+
 	ui.Handle("/sys/kbd/C-c", func(ui.Event) {
-		*terminateChan <- true
-		*stopWorkerChan <- true
+		close(*terminateChan)
+		close(*stopWorkerChan)
 		ui.StopLoop()
 	})
 }

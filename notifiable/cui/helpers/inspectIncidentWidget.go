@@ -3,7 +3,7 @@ package helpers
 import (
 	. "pdcli/backend/pd"
 
-	ui "github.com/pdevine/termui"
+	ui "github.com/mhmoudgmal/termui"
 )
 
 // InspectIncidentWidget

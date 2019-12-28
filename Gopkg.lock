@@ -18,6 +18,14 @@
   version = "v0.0.2"
 
 [[projects]]
+  branch = "item-in-memory-data"
+  digest = "1:6bb373b78a281099bec1621a8c4159c2e49d81bfe81c2ed58472b9bf9fa5516c"
+  name = "github.com/mhmoudgmal/termui"
+  packages = ["."]
+  pruneopts = ""
+  revision = "a8ec64446d6b82eda8ec83cc8486ae86509159ba"
+
+[[projects]]
   branch = "master"
   digest = "1:1856ee5a608d9e93667ac7811fc6360e2a9cae3ada938b3f13016c578b6d5f6e"
   name = "github.com/mitchellh/go-wordwrap"
@@ -80,14 +88,6 @@
   pruneopts = ""
   revision = "c893efa28eb45626cdaa76c9f653b62488858837"
   version = "v1.2.0"
-
-[[projects]]
-  branch = "listbox"
-  digest = "1:0ff648ad6afff2d4ec924669653b57ebabcdcc00c2da6afefe802fa2c831525d"
-  name = "github.com/pdevine/termui"
-  packages = ["."]
-  pruneopts = ""
-  revision = "86fcb5665c385cd27e94a0d2d4c82329cb50c840"
 
 [[projects]]
   branch = "master"
@@ -155,9 +155,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/mhmoudgmal/termui",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
-    "github.com/pdevine/termui",
     "gopkg.in/h2non/gock.v1",
   ]
   solver-name = "gps-cdcl"
