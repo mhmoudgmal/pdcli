@@ -3,7 +3,7 @@ package helpers
 import (
 	ui "github.com/mhmoudgmal/termui"
 
-	. "pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
 )
 
 // UpdateIncidentsWidget ...

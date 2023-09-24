@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	. "pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
 
 	ui "github.com/mhmoudgmal/termui"
 )

@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "pdcli/backend/pd"
-	. "pdcli/notifiable"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/notifiable"
 
 	"time"
 )

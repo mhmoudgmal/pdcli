@@ -3,9 +3,9 @@ package cui
 import (
 	ui "github.com/mhmoudgmal/termui"
 
-	. "pdcli/backend/pd"
-	. "pdcli/notifiable"
-	. "pdcli/notifiable/cui/helpers"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/notifiable"
+	. "github.com/mhmoudgmal/pdcli/notifiable/cui/helpers"
 )
 
 // Cui the command line interface notifiable client.

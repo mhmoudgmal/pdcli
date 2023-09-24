@@ -4,9 +4,9 @@ import (
 	"flag"
 	"time"
 
-	. "pdcli/backend/pd"
-	. "pdcli/notifiable"
-	. "pdcli/notifiable/Cui"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/notifiable"
+	. "github.com/mhmoudgmal/pdcli/notifiable/cui"
 )
 
 var (

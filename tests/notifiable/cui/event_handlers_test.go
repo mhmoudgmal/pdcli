@@ -6,9 +6,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
 
-	"pdcli/notifiable/cui"
+	"github.com/mhmoudgmal/pdcli/notifiable/cui"
 )
 
 var incidentsWdgtMock = ui.ListBox{

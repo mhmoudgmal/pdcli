@@ -1,8 +1,8 @@
 package cui
 
 import (
-	. "pdcli/backend/pd"
-	. "pdcli/notifiable/cui/helpers"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/notifiable/cui/helpers"
 
 	ui "github.com/mhmoudgmal/termui"
 )

@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
 )
 
 var _ = Describe("Incident", func() {

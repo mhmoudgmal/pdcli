@@ -1,10 +1,10 @@
 package notifiable
 
-import . "pdcli/backend/pd"
+import . "github.com/mhmoudgmal/pdcli/backend/pd"
 
 // Notifiable represents the client that gets notified with incidents.
 // Supported notifiable:
-//	- Cui: a command line interface
+//   - Cui: a command line interface
 //
 // Any other notifiable or client should implement this interface.
 type Notifiable interface {

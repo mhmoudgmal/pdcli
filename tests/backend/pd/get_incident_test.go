@@ -2,12 +2,13 @@ package pd_test
 
 import (
 	"encoding/json"
+
 	"gopkg.in/h2non/gock.v1"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "pdcli/backend/pd"
+	. "github.com/mhmoudgmal/pdcli/backend/pd"
 )
 
 var _ = Describe("PD backend API", func() {
